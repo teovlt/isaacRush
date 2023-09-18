@@ -55,3 +55,7 @@ class Player():
         if Player._instance is None:
             Player._instance = Player(screen, playerPos)
         return Player._instance
+
+    def get_rect(self):
+        from Game import Game
+        return pg.Rect(self.playerPos.x, self.playerPos.y, Game.UNIT_SIZE, Game.UNIT_SIZE)

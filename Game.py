@@ -38,6 +38,11 @@ class Game():
 
         npc.draw()
         npc.move()
+
+        rect1 = npc.get_rect()
+        rect2 = player.get_rect()
+        if rect1.colliderect(rect2):
+            npc.direction = npc.direction*-1
         # flip() the display to put your work on screen
         pg.display.flip()
 
