@@ -1,9 +1,24 @@
-import pygame
+
+import pygame as pg
 
 
-class Npc():
+class Npc(pg.sprite.Sprite):
+    def __init__(self, color, taille, pos, screen):
+        super().__init__()
+        self.image = pg.Surface((taille, taille))
+        self.image.fill(color)
+        self.color = color
+        self.taille = taille
+        self.speed = 3
+        self.direction = 1
+        self.targetX = 1255
+        self.screen = screen
+        self.pos = pos
 
-    def __init__(self):
-        self.__init__()
-        self.image = pygame.image.load("Assets/Npc's/npc.png", "image")
-        self.rect = self.image.get_rect()
+    def draw(self):
+        pg.draw.rect(self.screen, self.color, pg.Rect(self.pos.x, self.pos.y, self.taille, self.taille))
+
+    def move(self):
+        pass
+
+
