@@ -28,7 +28,7 @@ class Map:
         :param cvsFile: chemin du fichier csv
         :return: None
         """
-        self.blocs = [[0 for x in range(self.resolution[0])] for y in range(self.resolution[1])]
+
         if matriceBlocs != None:
             # lecture du fichier csv
             nbLigne = 0
@@ -38,6 +38,10 @@ class Map:
             lignes = file.read().split("\n")
             # supression de la dernière ligne vide
             lignes.pop()
+
+            # Initialisation de la matrice de blocs avec le bon nombre de lignes en fonction du csv
+            self.blocs = [[] for i in range(lignes.__len__())]
+
             # On récupère chaque éléments des lignes et on les transforme en entier
             for ligne in lignes:
                 line = ligne.split(",")
@@ -53,8 +57,6 @@ class Map:
             while i < self.resolution[1]:
                 j = 0
                 while j < self.resolution[0]:
-                    print(self.blocs[i][j])
-                    print(i,self.resolution, j)
                     if self.blocs[i][j] == 1:
                         self.blocs[i][j] = Bloc.Bloc(i * 25, j * 25)
                     j += 1
