@@ -1,7 +1,7 @@
 # Buffed Big Chunk
 
 ## Team
-- Dorianne Richard
+- Doriane Richard
 - Félix Picon
 - Gabriel Halus
 - Téo Villet
