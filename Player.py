@@ -14,13 +14,16 @@ class Player():
     def __init__(self, screen, playerPos):
         self.screen = screen
         self.playerPos = playerPos
+        self.rect = pg.Rect(self.playerPos.x, self.playerPos.y, GamePanel.UNIT_SIZE, GamePanel.UNIT_SIZE)
 
         self.verticalVelocity = 0
         self.gravity = 10
         self.onGround = False
 
     def draw(self):
-        pg.draw.rect(self.screen, "white", pg.Rect(self.playerPos.x, self.playerPos.y, GamePanel.UNIT_SIZE, GamePanel.UNIT_SIZE))
+        self.rect.x = self.playerPos.x
+        self.rect.y = self.playerPos.y
+        pg.draw.rect(self.screen, "white", self.rect)
   
     def move(self):
         keys = pg.key.get_pressed()
@@ -47,7 +50,7 @@ class Player():
         if keys[pg.K_SPACE] and self.onGround:
            self.verticalVelocity = -200 # Donner une impulsion au joueur
            self.onGround = False # Le joueur n'est plus au sol
-           
+
     @staticmethod
     def getInstance(screen, playerPos):
         if Player._instance is None:    
