@@ -6,17 +6,17 @@ class Game():
   SCREEN_HEIGHT = 720
   UNIT_SIZE = 25
   GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE
-  Clock = pg.time.Clock()
+  CLOCK = pg.time.Clock()
+  DT = 0
 
   def __init__(self):
     pg.init()
     screen = pg.display.set_mode((Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT))
     running = True
-    # dt = 0
 
     # Player
-    # player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() - Game.UNIT_SIZE)
-    # Player(screen, player_pos)
+    playerPos = pg.Vector2(screen.get_width() / 2, screen.get_height() - Game.UNIT_SIZE)
+    player = Player.getInstance(screen, playerPos)
 
     while running:
         # poll for events
@@ -25,8 +25,13 @@ class Game():
             if event.type == pg.QUIT:
                 running = False
 
+
         # fill the screen with a color to wipe away anything from last frame
         screen.fill("black")
+
+        # Player
+        player.draw()
+        player.move()
 
         # flip() the display to put your work on screen
         pg.display.flip()
@@ -34,6 +39,6 @@ class Game():
         # limits FPS to 60
         # dt is delta time in seconds since last frame, used for framerate-
         # independent physics.
-        dt = Game.Clock.tick(60) / 1000
+        Game.DT = Game.CLOCK.tick(60) / 1000
 
     pg.quit()

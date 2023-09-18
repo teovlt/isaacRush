@@ -1,5 +1,6 @@
 # main.py
 
-from game import Game
+from Game import Game
 
-Game.__init__()
+# Start the game
+Game()
