@@ -7,7 +7,6 @@ class Npc(pg.sprite.Sprite):
         super().__init__()
         self.image = pg.Surface((taille, taille))
         self.image.fill(color)
-        self.rect = self.image.get_rect()
         self.color = color
         self.taille = taille
         self.speed = 8
@@ -15,9 +14,13 @@ class Npc(pg.sprite.Sprite):
         self.targetX = 1255
         self.screen = screen
         self.pos = pos
+        self.rect = pg.Rect(self.pos.x, self.pos.y, taille, taille)
+
 
     def draw(self):
-        pg.draw.rect(self.screen, self.color, pg.Rect(self.pos.x, self.pos.y, self.taille, self.taille))
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
+        pg.draw.rect(self.screen, self.color, self.rect)
 
     def move(self):
         self.pos.x += self.speed * self.direction
@@ -29,6 +32,5 @@ class Npc(pg.sprite.Sprite):
 
 
 
-    def get_rect(self):
-        return pg.Rect(self.pos.x, self.pos.y, self.taille, self.taille)
+
 

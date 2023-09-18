@@ -1,54 +1,55 @@
 import pygame as pg
 from Npc import Npc
 from Player import Player
+from GamePanel import GamePanel
+
 
 class Game():
-  SCREEN_WIDTH = 1280
-  SCREEN_HEIGHT = 720
-  UNIT_SIZE = 25
-  GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE
-  CLOCK = pg.time.Clock()
-  DT = 0
-
-  def __init__(self):
-    pg.init()
-    screen = pg.display.set_mode((Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT))
-    running = True
-
-    # Player
-    playerPos = pg.Vector2(screen.get_width() / 2, screen.get_height() - Game.UNIT_SIZE)
-    player = Player.getInstance(screen, playerPos)
-
-    npc = Npc("blue", 25, pg.Vector2(0, 695), screen)
-
-    while running:
-        # poll for events
-        # pygame.QUIT event means the user clicked X to close your window
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                running = False
-
-
-        # fill the screen with a color to wipe away anything from last frame
-        screen.fill("black")
+    def __init__(self, screen):
+        running = True
+        self.screen = screen
 
         # Player
-        player.draw()
-        player.move()
+        playerPos = pg.Vector2(screen.get_width() / 2, screen.get_height() - GamePanel.UNIT_SIZE)
+        player = Player.getInstance(screen, playerPos)
 
-        npc.draw()
-        npc.move()
+        # Npc
+        npc = Npc("blue", 25, pg.Vector2(0, 695), screen)
 
-        rect1 = npc.get_rect()
-        rect2 = player.get_rect()
-        if rect1.colliderect(rect2):
-            npc.direction = npc.direction*-1
-        # flip() the display to put your work on screen
-        pg.display.flip()
+        while running:
+            # poll for events
+            # pygame.QUIT event means the user clicked X to close your window
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    running = False
 
-        # limits FPS to 60
-        # dt is delta time in seconds since last frame, used for framerate-
-        # independent physics.
-        Game.DT = Game.CLOCK.tick(60) / 1000
+            # fill the screen with a color to wipe away anything from last frame
+            screen.fill("black")
+
+            # Player
+            player.draw()
+            player.move()
+
+            # Npc
+            npc.draw()
+            npc.move()
+
+            rect1 = npc.rect
+            rect2 = player.rect
+            if not rect1.colliderect(rect2):
+                colided = True
+            if rect1.colliderect(rect2) and colided:
+                player.die()
+                npc.direction = npc.direction * -1
+                colided = False
+
+
+            # flip() the display to put your work on screen
+            pg.display.flip()
+
+            # limits FPS to 60
+            # dt is delta time in seconds since last frame, used for framerate-
+            # independent physics.
+            GamePanel.DT = GamePanel.CLOCK.tick(60) / 1000
 
     pg.quit()
