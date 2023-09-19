@@ -55,14 +55,33 @@ class Level:
                 self.setupLevel(self.csv)
             # collisions tiles
             elif sprite.rect.colliderect(player.rect):
-                # wall jump
-                player.canJump = True
+                # collisions gauche
                 if player.direction.x < 0:
+                    # blocage du joueur au niveau du bord droite du tile
                     player.rect.left = sprite.rect.right
-                    self.current_x = player.rect.left
+                    # empêcher le joueur de sauter deux fois du même mur
+                    if player.lastJump != "gauche":
+                        player.canJump = True
+                    #le dernier saut a été fait depuis le mur gauche
+                    player.lastJump = "gauche"
+                    #le joueur est en collision avec le mur gauche
+                    player.collisionGauche = True
+                # collisions droite
                 elif player.direction.x > 0:
+                    # blocage du joueur au niveau du bord gauche du tile
                     player.rect.right = sprite.rect.left
-                    self.current_x = player.rect.right
+                    # empêcher le joueur de sauter deux fois du même mur
+                    if player.lastJump != "droite":
+                        player.canJump = True
+                    # le dernier saut a été fait depuis le mur droit
+                    player.lastJump = "droite"
+                    # le joueur est en collision avec le mur droit
+                    player.collisionDroite = True
+        # si le joueur bouge sur l'axe y plus que les valeur suivantes, on considère qu'il n'est plus en collision avec le mur 
+        # TODO: trouver une meilleure solution pour les valeurs
+        if (player.collisionDroite or player.collisionGauche) and (player.direction.x < -1 or player.direction.x > 8) :
+            player.collisionDroite = False
+            player.collisionGauche = False
 
 
     def verticalMovementCollision(self):
@@ -83,7 +102,6 @@ class Level:
                 elif player.direction.y < 0:
                     player.rect.top = sprite.rect.bottom
                     player.direction.y = 0
-
         if player.onGround and player.direction.y < 0 or player.direction.y > 1:
             player.onGround = False
 
