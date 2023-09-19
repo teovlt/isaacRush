@@ -17,13 +17,12 @@ level = Level(screen, "./map.csv")
 pygame.display.set_caption("NOM DU JEU")
 #son
 pygame.mixer.init()
-son = pygame.mixer.Sound("Audio/3.mp3")
-
+pygame.mixer.music.load("Audio/3.mp3")
+pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            son.stop()
             pygame.quit()
             sys.exit()
 
@@ -31,11 +30,11 @@ while True:
     if startTime is None or level.finish:
         startTime = pygame.time.get_ticks()
         level.finish = False
+
         if current_time < bestTime or bestTime == 0:
             bestTime = current_time
 
     level.run()
-    son.play()
 
     font = pygame.font.Font(None, 36)
     current_time = pygame.time.get_ticks() - startTime
