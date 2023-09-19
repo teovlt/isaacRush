@@ -1,8 +1,19 @@
 # main.py
+import pygame, sys
+from settings import *
 
-from GamePanel import GamePanel
-from Game import Game
+# Pygame setup
+pygame.init()
+screen = pygame.display.set_mode((screen_width, screen_height))
+clock = pygame.time.Clock()
 
-# Start the game
-gamePanel = GamePanel()
-Game(gamePanel.screen)
+while True:
+    for event in pygame.eveng.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        
+    screen.fill("black")
+
+    pygame.display.update()
+    clock.tick(60) # limiter à 60fps
