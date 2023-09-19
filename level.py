@@ -14,6 +14,7 @@ class Level:
         self.worldShift = 0
         self.currentX = 0
 
+
     def setupLevel(self, csv):
         self.tiles = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
@@ -40,7 +41,7 @@ class Level:
                     spike = Spike((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(spike)
                 elif cell == 4:
-                    npc = Npc((x * tileSize, y * tileSize + tileSize / 2))
+                    npc = Npc((x * tileSize, y * tileSize))
                     self.npcs.add(npc)
 
 
@@ -64,22 +65,6 @@ class Level:
                     self.current_x = player.rect.right
 
 
-    def horizontalMovementCollisionNpcs(self):
-        npcs = self.npcs.sprites()
-        player = self.player.sprite
-
-        for npc in npcs:
-            for sprite in self.tiles.sprites():
-                if sprite.rect.colliderect(npc.rect) and npc.direction.x < 0:
-                    npc.rect.left = sprite.rect.right
-                    npc.direction.x = 1
-                elif sprite.rect.colliderect(npc.rect) and npc.direction.x > 0:
-                    npc.rect.right = sprite.rect.left
-                    npc.direction.x = -1
-                elif npc.rect.colliderect(player.rect):
-                     self.setupLevel(self.csv)
-
-
     def verticalMovementCollision(self):
         # gestion des collisions verticales
         player = self.player.sprite
@@ -99,9 +84,37 @@ class Level:
                     player.rect.top = sprite.rect.bottom
                     player.direction.y = 0
 
-
         if player.onGround and player.direction.y < 0 or player.direction.y > 1:
             player.onGround = False
+
+
+    def npcHorizontalMovementCollision(self):
+        player = self.player.sprite
+
+        for npc in self.npcs.sprites():
+            npc.rect.x += npc.direction.x * npc.speed
+            for tile in self.tiles.sprites():
+                if tile.rect.colliderect(npc.rect) and npc.direction.x < 0:
+                    npc.rect.left = tile.rect.right
+                    npc.direction.x = 1
+                elif tile.rect.colliderect(npc.rect) and npc.direction.x > 0:
+                    npc.rect.right = tile.rect.left
+                    npc.direction.x = -1
+
+                if npc.rect.colliderect(player.rect):
+                     self.setupLevel(self.csv)
+
+
+    def npcVerticalMovementCollision(self):
+        player = self.player.sprite
+
+        for npc in self.npcs.sprites():
+            npc.applyGravity()
+
+            for tile in self.tiles.sprites():
+                if tile.rect.colliderect(npc.rect):
+                    npc.rect.bottom = tile.rect.top
+                    npc.direction.y = 0
 
     def scrollX(self):
         player = self.player.sprite
@@ -117,6 +130,7 @@ class Level:
         else:
             self.worldShift = 0
             player.speed = 8
+
 
     def run(self):
         # tiles
@@ -135,4 +149,5 @@ class Level:
         # npcs
         self.npcs.draw(self.displaySurface)
         self.npcs.update(self.worldShift)
-        self.horizontalMovementCollisionNpcs()
+        self.npcHorizontalMovementCollision()
+        self.npcVerticalMovementCollision()

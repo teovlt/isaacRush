@@ -11,11 +11,15 @@ class Npc(pygame.sprite.Sprite):
 
         # déplacements
         self.direction = pygame.Vector2(1, 0)
-        self.speed = 5
+        self.gravity = .8
+        self.speed = 2
 
         # état
         self.onGround = False
 
+    def applyGravity(self):
+        self.direction.y += self.gravity
+        self.rect.y += self.direction.y
+
     def update(self, xShift):
         self.rect.x += xShift
-        self.rect.x += self.speed * self.direction.x
