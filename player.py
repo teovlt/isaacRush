@@ -1,18 +1,19 @@
 # player.py
 import pygame
+from settings import tileSize
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
-        self.image = pygame.Surface((32,64))
+        self.image = pygame.Surface((tileSize/2,tileSize))
         self.image.fill("red")
         self.rect = self.image.get_rect(topleft = pos)
 
         # déplacements
         self.direction = pygame.Vector2(0, 0)
-        self.speed = 8
-        self.gravity = 0.8
-        self.jumpSpeed = -16
+        self.speed = tileSize/8
+        self.gravity = tileSize/80
+        self.jumpSpeed = -tileSize/4
 
         # état
         self.onGround = False
@@ -50,12 +51,8 @@ class Player(pygame.sprite.Sprite):
                 # on saute
                 self.direction.y = self.jumpSpeed
 
-
-
-
-
-
         self.canJump = False
 
-    def update(self):
+    def update(self, shift):
         self.getInput()
+        self.rect.y += shift.y

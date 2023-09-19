@@ -1,7 +1,5 @@
 # spike.py
-
 import tile
-
 
 class Spike(tile.Tile):
     def __init__(self, pos, size):

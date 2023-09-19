@@ -1,8 +1,8 @@
 # level.py
 import pygame
+from settings import tileSize, screenWidth, screenHeight
 from tile import Tile
 from player import Player
-from settings import tileSize, screenWidth
 from npc import Npc
 from spike import Spike
 
@@ -12,7 +12,7 @@ class Level:
         self.csv = csv
         self.displaySurface = surface
         self.setupLevel(csv)
-        self.worldShift = 0
+        self.worldShift = pygame.math.Vector2(0,0)
         self.currentX = 0
         self.finish = False
 
@@ -77,26 +77,12 @@ class Level:
                     player.lastJump = "droite"
                     # le joueur est en collision avec le mur droit
                     player.collisionDroite = True
-        # si le joueur bouge sur l'axe y plus que les valeur suivantes, on considère qu'il n'est plus en collision avec le mur #TODO: trouver une meilleure solution pour les valeurs
+        # si le joueur bouge sur l'axe y plus que les valeur suivantes, on considère qu'il n'est plus en collision avec le mur 
+        # TODO: trouver une meilleure solution pour les valeurs
         if (player.collisionDroite or player.collisionGauche) and (player.direction.x < -1 or player.direction.x > 8) :
             player.collisionDroite = False
             player.collisionGauche = False
 
-    def horizontalMovementCollisionNpcs(self):
-        npcs = self.npcs.sprites()
-        player = self.player.sprite
-
-        for npc in npcs:
-            for sprite in self.tiles.sprites():
-                if sprite.rect.colliderect(npc.rect) and npc.direction.x < 0:
-                    npc.rect.left = sprite.rect.right
-                    npc.direction.x = 1
-                elif sprite.rect.colliderect(npc.rect) and npc.direction.x > 0:
-                    npc.rect.right = sprite.rect.left
-                    npc.direction.x = -1
-                elif npc.rect.colliderect(player.rect):
-                    self.setupLevel(self.csv)
-                    self.finish = True
 
     def verticalMovementCollision(self):
         # gestion des collisions verticales
@@ -122,35 +108,84 @@ class Level:
         if player.onGround and player.direction.y < 0 or player.direction.y > 1:
             player.onGround = False
 
+
+    def npcHorizontalMovementCollision(self):
+        player = self.player.sprite
+
+        for npc in self.npcs.sprites():
+            npc.rect.x += npc.direction.x * npc.speed
+            for tile in self.tiles.sprites():
+                if tile.rect.colliderect(npc.rect) and npc.direction.x < 0:
+                    npc.rect.left = tile.rect.right
+                    npc.direction.x = 1
+                elif tile.rect.colliderect(npc.rect) and npc.direction.x > 0:
+                    npc.rect.right = tile.rect.left
+                    npc.direction.x = -1
+
+                if npc.rect.colliderect(player.rect):
+                     self.setupLevel(self.csv)
+
+
+    def npcVerticalMovementCollision(self):
+        player = self.player.sprite
+
+        for npc in self.npcs.sprites():
+            npc.applyGravity()
+
+            for tile in self.tiles.sprites():
+                if tile.rect.colliderect(npc.rect):
+                    npc.rect.bottom = tile.rect.top
+                    npc.direction.y = 0
+
     def scrollX(self):
         player = self.player.sprite
         playerX = player.rect.centerx
         directionX = player.direction.x
 
         if playerX < screenWidth / 4 and directionX < 0:
-            self.worldShift = 8
+            self.worldShift.x = tileSize/8
             player.speed = 0
         elif playerX > screenWidth - (screenWidth / 4) and directionX > 0:
-            self.worldShift = -8
+            self.worldShift.x = -tileSize/8
             player.speed = 0
         else:
-            self.worldShift = 0
-            player.speed = 8
+            self.worldShift.x = 0
+            player.speed = tileSize/8
+
+
+    def cameraFollowPlayer(self):
+        player = self.player.sprite
+        playerY = player.rect.centery
+        screenCenter = screenHeight / 2
+        playerDelta = screenCenter - playerY
+
+        if abs(playerDelta) - 100 > 0:
+            if playerDelta > 0:
+                self.worldShift.y = playerDelta - 100
+            if playerDelta < 0:
+                self.worldShift.y = playerDelta + 100
+        else:
+            self.worldShift.y = 0
+
 
     def run(self):
-        # tiles
+        self.scrollX()
+        # updates
         self.tiles.update(self.worldShift)
+        self.npcs.update(self.worldShift)
+        self.player.update(self.worldShift)
+        
+        # tiles
         self.tiles.draw(self.displaySurface)
 
         # player
-        self.player.update()
+        self.player.draw(self.displaySurface)
         self.horizontalMovementCollision()
         self.verticalMovementCollision()
-
-        self.scrollX()
-        self.player.draw(self.displaySurface)
-
+                                                                                
         # npcs
         self.npcs.draw(self.displaySurface)
-        self.npcs.update(self.worldShift)
-        self.horizontalMovementCollisionNpcs()
+        self.npcHorizontalMovementCollision()
+        self.npcVerticalMovementCollision()
+        
+        self.cameraFollowPlayer()
