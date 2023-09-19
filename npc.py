@@ -1,7 +1,5 @@
 
 import pygame as pg
-
-
 class Npc(pg.sprite.Sprite):
     def __init__(self, color, taille, pos, screen):
         super().__init__()
@@ -15,7 +13,6 @@ class Npc(pg.sprite.Sprite):
         self.screen = screen
         self.pos = pos
         self.rect = pg.Rect(self.pos.x, self.pos.y, taille, taille)
-
 
     def draw(self):
         self.rect.x = self.pos.x
