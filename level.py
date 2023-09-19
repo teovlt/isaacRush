@@ -77,10 +77,12 @@ class Level:
                     player.lastJump = "droite"
                     # le joueur est en collision avec le mur droit
                     player.collisionDroite = True
-        # si le joueur bouge sur l'axe y plus que les valeur suivantes, on considère qu'il n'est plus en collision avec le mur #TODO: trouver une meilleure solution pour les valeurs
-        if (player.collisionDroite or player.collisionGauche) and (player.direction.x < -1 or player.direction.x > 8) :
+        # print(player.direction.x)
+        # si le joueur bouge sur l'axe x , on considère qu'il n'est plus en collision avec le mur
+        if (player.collisionDroite and player.direction.x < 1) or (player.collisionGauche and player.direction.x > -1):
             player.collisionDroite = False
             player.collisionGauche = False
+
 
     def horizontalMovementCollisionNpcs(self):
         npcs = self.npcs.sprites()
