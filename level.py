@@ -1,5 +1,9 @@
 # level.py
 import pygame
+
+from checkpoint import Checkpoint
+from end import End
+from powerup import Powerup
 from tile import Tile
 from player import Player
 from settings import tileSize, screenWidth
@@ -31,26 +35,44 @@ class Level:
                 cell = int(cell)
                 x = colIndex
                 y = rowIndex
-                if cell == 1:
+                if cell == 1:       # tile -> bloc de mur/sol
                     tile = Tile((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(tile)
-                elif cell == 2:
+                elif cell == 2:     # Joueur
                     player_sprite = Player((x * tileSize, y * tileSize))
                     self.player.add(player_sprite)
-                elif cell == 3:
+                elif cell == 3:     # spike -> pic
                     spike = Spike((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(spike)
-                elif cell == 4:
+                elif cell == 4:     # npc -> ennemi
                     npc = Npc((x * tileSize, y * tileSize + tileSize / 2))
                     self.npcs.add(npc)
+                elif cell == 5:
+                    end = End((x * tileSize, y * tileSize), tileSize)
+                    self.tiles.add(end)
+                elif cell == 6:
+                    powerup = Powerup((x * tileSize, y * tileSize), tileSize)
+                    self.tiles.add(powerup)
+                elif cell == 7:
+                    checkpoint = Checkpoint((x * tileSize, y * tileSize), tileSize)
+                    self.tiles.add(checkpoint)
 
     def horizontalMovementCollision(self):
         # gestion des collisions horizontales
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
         for sprite in self.tiles.sprites():
+            # disable collisions end
+            if sprite.rect.colliderect(player.rect) and sprite.end:
+                print("fini")
+            # disable collisions powerup
+            elif sprite.rect.colliderect(player.rect) and sprite.powerup:
+                print("powerup")
+            # disable collisions checkpoint
+            elif sprite.rect.colliderect(player.rect) and sprite.checkpoint:
+                print("checkpoint")
             #collisions spike
-            if sprite.rect.colliderect(player.rect) and sprite.deadly:
+            elif sprite.rect.colliderect(player.rect) and sprite.deadly:
                 self.setupLevel(self.csv)
             # collisions tiles
                 self.finish = True
@@ -105,8 +127,17 @@ class Level:
         player = self.player.sprite
         player.applyGravity()
         for sprite in self.tiles.sprites():
+            # disable collisions end
+            if sprite.rect.colliderect(player.rect) and sprite.end:
+                print("fini")
+            # disable collisions powerup
+            elif sprite.rect.colliderect(player.rect) and sprite.powerup:
+                print("powerup")
+            # disable collisions checkpoint
+            elif sprite.rect.colliderect(player.rect) and sprite.checkpoint:
+                print("checkpoint")
             # collisions spike
-            if sprite.rect.colliderect(player.rect) and sprite.deadly:
+            elif sprite.rect.colliderect(player.rect) and sprite.deadly:
                 self.setupLevel(self.csv)
                 self.finish = True
             # collisions tiles

@@ -8,6 +8,9 @@ class Tile(pygame.sprite.Sprite):
         self.image.fill('grey')
         self.rect = self.image.get_rect(topleft = pos)
         self.deadly = False
+        self.end = False
+        self.powerup = False
+        self.checkpoint = False
 
     def update(self, x_shift):
         self.rect.x += x_shift
