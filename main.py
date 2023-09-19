@@ -8,7 +8,7 @@ pygame.init()
 screen = pygame.display.set_mode((screenWidth, screenHeight))
 clock = pygame.time.Clock()
 level = Level(screen, "./map.csv")
-
+pygame.display.set_caption("Buffed-big-chunk")
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
