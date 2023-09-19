@@ -45,14 +45,18 @@ class Level:
                     self.npcs.add(npc)
 
     def horizontalMovementCollision(self):
+        # gestion des collisions horizontales
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
-
         for sprite in self.tiles.sprites():
+            #collisions spike
             if sprite.rect.colliderect(player.rect) and sprite.deadly:
                 self.setupLevel(self.csv)
+            # collisions tiles
                 self.finish = True
             elif sprite.rect.colliderect(player.rect):
+                # wall jump
+                player.canJump = True
                 if player.direction.x < 0:
                     player.rect.left = sprite.rect.right
                     self.current_x = player.rect.left
@@ -77,18 +81,21 @@ class Level:
                     self.finish = True
 
     def verticalMovementCollision(self):
+        # gestion des collisions verticales
         player = self.player.sprite
         player.applyGravity()
-
         for sprite in self.tiles.sprites():
+            # collisions spike
             if sprite.rect.colliderect(player.rect) and sprite.deadly:
                 self.setupLevel(self.csv)
+            # collisions tiles
                 self.finish = True
             elif sprite.rect.colliderect(player.rect):
                 if player.direction.y > 0:
                     player.rect.bottom = sprite.rect.top
                     player.direction.y = 0
                     player.onGround = True
+                    player.canJump = True
                 elif player.direction.y < 0:
                     player.rect.top = sprite.rect.bottom
                     player.direction.y = 0
