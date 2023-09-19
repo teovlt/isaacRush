@@ -1,3 +1,3 @@
-tile_size = 64
-screen_width: 1280
-screen_height: 720
+titleSize = 64
+screenWidth: 1280
+screenHeight: 720
