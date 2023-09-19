@@ -99,6 +99,10 @@ class Level:
                 elif player.direction.y < 0:
                     player.rect.top = sprite.rect.bottom
                     player.direction.y = 0
+        for npc in self.npcs.sprites():
+            if npc.rect.colliderect(player.rect):
+                npc.kill()
+                self.player.sprite.jump()
 
         if player.onGround and player.direction.y < 0 or player.direction.y > 1:
             player.onGround = False
