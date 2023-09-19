@@ -2,7 +2,6 @@
 import pygame
 from settings import tileSize, screenWidth, screenHeight
 from checkpoint import Checkpoint
-from end import End
 from powerup import Powerup
 from tile import Tile
 from player import Player
