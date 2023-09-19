@@ -2,8 +2,9 @@
 import pygame
 from tile import Tile
 from player import Player
-from spike import Spike
 from settings import tileSize, screenWidth
+from npc import Npc
+from spike import Spike
 
 class Level:
     def __init__(self, surface, csv):
@@ -16,6 +17,8 @@ class Level:
     def setupLevel(self, csv):
         self.tiles = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
+        self.npcs = pygame.sprite.Group()
+
 
         file = open(csv, "r")
         rows = file.read().split("\n")
@@ -36,6 +39,10 @@ class Level:
                 elif cell == 3:
                     spike = Spike((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(spike)
+                elif cell == 4:
+                    npc = Npc((x * tileSize, y * tileSize + tileSize / 2))
+                    self.npcs.add(npc)
+
 
     def horizontalMovementCollision(self):
         player = self.player.sprite
@@ -51,6 +58,22 @@ class Level:
                 elif player.direction.x > 0:
                     player.rect.right = sprite.rect.left
                     self.current_x = player.rect.right
+
+
+    def horizontalMovementCollisionNpcs(self):
+        npcs = self.npcs.sprites()
+        player = self.player.sprite
+
+        for npc in npcs:
+            for sprite in self.tiles.sprites():
+                if sprite.rect.colliderect(npc.rect) and npc.direction.x < 0:
+                    npc.rect.left = sprite.rect.right
+                    npc.direction.x = 1
+                elif sprite.rect.colliderect(npc.rect) and npc.direction.x > 0:
+                    npc.rect.right = sprite.rect.left
+                    npc.direction.x = -1
+                elif npc.rect.colliderect(player.rect):
+                     self.setupLevel(self.csv)
 
 
     def verticalMovementCollision(self):
@@ -93,6 +116,7 @@ class Level:
         self.tiles.update(self.worldShift)
         self.tiles.draw(self.displaySurface)
 
+
         # player
         self.player.update()
         self.horizontalMovementCollision()
@@ -100,3 +124,8 @@ class Level:
 
         self.scrollX()
         self.player.draw(self.displaySurface)
+                                                                                
+        # npcs
+        self.npcs.draw(self.displaySurface)
+        self.npcs.update(self.worldShift)
+        self.horizontalMovementCollisionNpcs()
