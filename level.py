@@ -134,7 +134,6 @@ class Level:
                     player.rect.top = sprite.rect.bottom
                     player.direction.y = 0
 
-
         if player.onGround and player.direction.y < 0 or player.direction.y > 1:
             player.onGround = False
 
