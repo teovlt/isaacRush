@@ -1,13 +1,13 @@
 # main.py
 import pygame, sys
-from settings import *
 from level import Level
+from settings import *
 
 # Pygame setup
 pygame.init()
-screen = pygame.display.set_mode((screen_width, screen_height))
+screen = pygame.display.set_mode((screenWidth, screenHeight))
 clock = pygame.time.Clock()
-level = Level(level_map, screen)
+level = Level(screen, "./map.csv")
 
 while True:
     for event in pygame.event.get():
@@ -15,8 +15,8 @@ while True:
             pygame.quit()
             sys.exit()
 
-    screen.fill('black')
+    screen.fill("black")
     level.run()
 
     pygame.display.update()
-    clock.tick(60)
+    clock.tick(60) # limiter à 60fps
