@@ -45,7 +45,6 @@ class Level:
                     player.rect.right = sprite.rect.left
                     self.current_x = player.rect.right
 
-
     def verticalMovementCollision(self):
         player = self.player.sprite
         player.applyGravity()
@@ -62,7 +61,6 @@ class Level:
 
         if player.onGround and player.direction.y < 0 or player.direction.y > 1:
             player.onGround = False
-
 
     def scrollX(self):
         player = self.player.sprite
