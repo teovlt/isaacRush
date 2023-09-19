@@ -1,4 +1,4 @@
 # settings.py
-tileSize = 64
+tileSize = 52
 screenWidth = 1280
 screenHeight = 720

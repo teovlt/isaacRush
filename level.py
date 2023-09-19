@@ -1,6 +1,6 @@
 # level.py
 import pygame
-from settings import tileSize, screenWidth
+from settings import tileSize, screenWidth, screenHeight
 from tile import Tile
 from player import Player
 from npc import Npc
@@ -40,9 +40,9 @@ class Level:
                 elif cell == 3:
                     spike = Spike((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(spike)
-                elif cell == 4:
-                    npc = Npc((x * tileSize, y * tileSize))
-                    self.npcs.add(npc)
+                # elif cell == 4:
+                #     npc = Npc((x * tileSize, y * tileSize))
+                #     self.npcs.add(npc)
 
 
     def horizontalMovementCollision(self):
@@ -140,36 +140,49 @@ class Level:
         directionX = player.direction.x
 
         if playerX < screenWidth / 4 and directionX < 0:
-            self.worldShift.x = 8
+            self.worldShift.x = tileSize/8
             player.speed = 0
         elif playerX > screenWidth - (screenWidth / 4) and directionX > 0:
-            self.worldShift.x = -8
+            self.worldShift.x = -tileSize/8
             player.speed = 0
         else:
             self.worldShift.x = 0
-            player.speed = 8
+            player.speed = tileSize/8
 
 
     def cameraFollowPlayer(self):
-        pass
+        player = self.player.sprite
+        playerY = player.rect.centery
+        screenCenter = screenHeight / 2
+        playerDelta = screenCenter - playerY
+
+        if abs(playerDelta) - 100 > 0:
+            if playerDelta > 0:
+                self.worldShift.y = playerDelta - 100
+            if playerDelta < 0:
+                self.worldShift.y = playerDelta + 100
+        else:
+            self.worldShift.y = 0
 
 
     def run(self):
-        # tiles
+        # updates
         self.tiles.update(self.worldShift)
+        self.npcs.update(self.worldShift)
+        self.player.update(self.worldShift)
+        
+        # tiles
         self.tiles.draw(self.displaySurface)
 
-
         # player
-        self.player.update()
+        self.player.draw(self.displaySurface)
         self.horizontalMovementCollision()
         self.verticalMovementCollision()
-
-        self.scrollX()
-        self.player.draw(self.displaySurface)
                                                                                 
         # npcs
         self.npcs.draw(self.displaySurface)
-        self.npcs.update(self.worldShift)
         self.npcHorizontalMovementCollision()
         self.npcVerticalMovementCollision()
+        
+        self.scrollX()
+        self.cameraFollowPlayer()

@@ -11,3 +11,4 @@ class Tile(pygame.sprite.Sprite):
 
     def update(self, shift):
         self.rect.x += shift.x
+        self.rect.y += shift.y
