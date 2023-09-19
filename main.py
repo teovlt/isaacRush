@@ -17,8 +17,7 @@ level = Level(screen, "./map.csv")
 pygame.display.set_caption("NOM DU JEU")
 #son
 pygame.mixer.init()
-son = pygame.mixer.Sound("Audio/song.mp3")
-son.set_volume(0)
+son = pygame.mixer.Sound("Audio/3.mp3")
 
 
 while True:
