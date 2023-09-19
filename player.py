@@ -18,11 +18,6 @@ class Player(pygame.sprite.Sprite):
         self.onGround = False
         self.canJump = False
 
-        self.lastJump = "sol"
-
-        self.collisionGauche= False
-        self.collisionDroite= False
-
     def getInput(self):
         keys = pygame.key.get_pressed()
 
@@ -33,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.x = 0
 
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] and self.canJump:
             self.jump()
 
 
@@ -42,19 +37,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.direction.y
 
     def jump(self):
-        if self.canJump:
-            if self.onGround:
-                self.direction.y = self.jumpSpeed
-                self.lastJump = "sol"
-            elif self.collisionDroite or self.collisionGauche:
-                # on saute
-                self.direction.y = self.jumpSpeed
-
-
-
-
-
-
+        self.direction.y = self.jumpSpeed
         self.canJump = False
 
     def update(self):
