@@ -3,6 +3,7 @@ import pygame
 from tile import Tile
 from player import Player
 from settings import tileSize, screenWidth
+from npc import Npc
 
 class Level:
     def __init__(self, surface, csv):
@@ -14,6 +15,8 @@ class Level:
     def setupLevel(self, csv):
         self.tiles = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
+        self.npcs = pygame.sprite.Group()
+
 
         file = open(csv, "r")
         rows = file.read().split("\n")
@@ -31,6 +34,10 @@ class Level:
                 elif cell == 2:
                     player_sprite = Player((x * tileSize, y * tileSize))
                     self.player.add(player_sprite)
+                elif cell == 4:
+                    npc = Npc((x * tileSize, y * tileSize + tileSize / 2))
+                    self.npcs.add(npc)
+
 
     def horizontalMovementCollision(self):
         player = self.player.sprite
@@ -44,6 +51,19 @@ class Level:
                 elif player.direction.x > 0:
                     player.rect.right = sprite.rect.left
                     self.current_x = player.rect.right
+
+
+    def horizontalMovementCollisionNpcs(self):
+        npcs = self.npcs.sprites()
+
+        for npc in npcs:
+            for sprite in self.tiles.sprites():
+                if sprite.rect.colliderect(npc.rect) and npc.direction.x < 0:
+                    npc.rect.left = sprite.rect.right
+                    npc.direction.x = 1
+                elif sprite.rect.colliderect(npc.rect) and npc.direction.x > 0:
+                    npc.rect.right = sprite.rect.left
+                    npc.direction.x = -1
 
     def verticalMovementCollision(self):
         player = self.player.sprite
@@ -89,3 +109,8 @@ class Level:
 
         self.scrollX()
         self.player.draw(self.displaySurface)
+                                                                                
+        # npcs
+        self.npcs.draw(self.displaySurface)
+        self.npcs.update(self.worldShift)
+        self.horizontalMovementCollisionNpcs()
