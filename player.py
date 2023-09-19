@@ -47,6 +47,7 @@ class Player(pygame.sprite.Sprite):
             if self.onGround:
                 self.direction.y = self.jumpSpeed
                 self.lastJump = "sol"
+
             elif self.collisionDroite or self.collisionGauche:
                 # on saute
                 self.direction.y = self.jumpSpeed
