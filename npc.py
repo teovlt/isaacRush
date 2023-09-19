@@ -21,5 +21,5 @@ class Npc(pygame.sprite.Sprite):
         self.direction.y += self.gravity
         self.rect.y += self.direction.y
 
-    def update(self, xShift):
-        self.rect.x += xShift
+    def update(self, shift):
+        self.rect.x += shift.x

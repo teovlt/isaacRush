@@ -1,8 +1,8 @@
 # level.py
 import pygame
+from settings import tileSize, screenWidth
 from tile import Tile
 from player import Player
-from settings import tileSize, screenWidth
 from npc import Npc
 from spike import Spike
 
@@ -11,7 +11,7 @@ class Level:
         self.csv = csv
         self.displaySurface = surface
         self.setupLevel(csv)
-        self.worldShift = 0
+        self.worldShift = pygame.math.Vector2(0,0)
         self.currentX = 0
 
 
@@ -122,14 +122,18 @@ class Level:
         directionX = player.direction.x
 
         if playerX < screenWidth / 4 and directionX < 0:
-            self.worldShift = 8
+            self.worldShift.x = 8
             player.speed = 0
         elif playerX > screenWidth - (screenWidth / 4) and directionX > 0:
-            self.worldShift = -8
+            self.worldShift.x = -8
             player.speed = 0
         else:
-            self.worldShift = 0
+            self.worldShift.x = 0
             player.speed = 8
+
+
+    def cameraFollowPlayer(self):
+        pass
 
 
     def run(self):
