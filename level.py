@@ -6,23 +6,24 @@ from settings import tileSize, screenWidth
 from npc import Npc
 from spike import Spike
 
+
 class Level:
     def __init__(self, surface, csv):
         self.csv = csv
         self.displaySurface = surface
         self.setupLevel(csv)
         self.worldShift = 0
-
+        self.currentX = 0
+        self.finish = False
 
     def setupLevel(self, csv):
         self.tiles = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
         self.npcs = pygame.sprite.Group()
 
-
         file = open(csv, "r")
         rows = file.read().split("\n")
-        rows.pop() # Supprimer la dernière ligne vide
+        rows.pop()  # Supprimer la dernière ligne vide
 
         for rowIndex, row in enumerate(rows):
             row = row.split(",")
@@ -43,7 +44,6 @@ class Level:
                     npc = Npc((x * tileSize, y * tileSize + tileSize / 2))
                     self.npcs.add(npc)
 
-
     def horizontalMovementCollision(self):
         # gestion des collisions horizontales
         player = self.player.sprite
@@ -53,6 +53,7 @@ class Level:
             if sprite.rect.colliderect(player.rect) and sprite.deadly:
                 self.setupLevel(self.csv)
             # collisions tiles
+                self.finish = True
             elif sprite.rect.colliderect(player.rect):
                 # collisions gauche
                 if player.direction.x < 0:
@@ -81,7 +82,6 @@ class Level:
             player.collisionDroite = False
             player.collisionGauche = False
 
-
     def horizontalMovementCollisionNpcs(self):
         npcs = self.npcs.sprites()
         player = self.player.sprite
@@ -95,8 +95,8 @@ class Level:
                     npc.rect.right = sprite.rect.left
                     npc.direction.x = -1
                 elif npc.rect.colliderect(player.rect):
-                     self.setupLevel(self.csv)
-
+                    self.setupLevel(self.csv)
+                    self.finish = True
 
     def verticalMovementCollision(self):
         # gestion des collisions verticales
@@ -106,6 +106,7 @@ class Level:
             # collisions spike
             if sprite.rect.colliderect(player.rect) and sprite.deadly:
                 self.setupLevel(self.csv)
+                self.finish = True
             # collisions tiles
             elif sprite.rect.colliderect(player.rect):
                 if player.direction.y > 0:
@@ -116,6 +117,8 @@ class Level:
                 elif player.direction.y < 0:
                     player.rect.top = sprite.rect.bottom
                     player.direction.y = 0
+
+
         if player.onGround and player.direction.y < 0 or player.direction.y > 1:
             player.onGround = False
 
@@ -139,7 +142,6 @@ class Level:
         self.tiles.update(self.worldShift)
         self.tiles.draw(self.displaySurface)
 
-
         # player
         self.player.update()
         self.horizontalMovementCollision()
@@ -147,7 +149,7 @@ class Level:
 
         self.scrollX()
         self.player.draw(self.displaySurface)
-                                                                                
+
         # npcs
         self.npcs.draw(self.displaySurface)
         self.npcs.update(self.worldShift)
