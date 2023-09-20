@@ -6,26 +6,29 @@ from timer import Timer
 timer = Timer()
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, level):
         super().__init__()
         self.image = pygame.Surface((tileSize/2,tileSize))
         self.image.fill("red")
         self.rect = self.image.get_rect(topleft = pos)
+        self.level = level
 
         # déplacements
         self.direction = pygame.Vector2(0, 0)
         self.speed = tileSize/8
         self.gravity = tileSize/80
         self.jumpSpeed = -tileSize/4
+        self.spacePressed = False
 
         # état
         self.onGround = False
         self.canJump = False
-
-        self.lastJump = "sol"
-
-        self.collisionGauche= False
-        self.collisionDroite= False
+        self.canJumpOnLeft = False
+        self.canJumpOnRight = False
+        self.collideOnLeft= False
+        self.collideOnRight= False
+        self.collisionLadder = False
+        self.lastCheckpoint = None
 
     def getInput(self):
         keys = pygame.key.get_pressed()
@@ -40,25 +43,49 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.x = 0
 
+        if keys[pygame.K_SPACE] and not self.spacePressed:
+            self.jump()
+            self.spacePressed = True
+        elif not keys[pygame.K_SPACE]:
+            self.spacePressed = False
+
+        if keys[pygame.K_UP] or keys[pygame.K_z]:
+            self.ladderClimb()
+
         if keys[pygame.K_SPACE]:
             self.jump()
 
+        if keys[pygame.K_e]:
+            self.level.antigravite()
 
     def applyGravity(self):
         self.direction.y += self.gravity
         self.rect.y += self.direction.y
 
     def jump(self):
-        if self.canJump:
-            if self.onGround:
-                self.direction.y = self.jumpSpeed
-                self.lastJump = "sol"
+        if self.onGround and self.canJump:
+            self.direction.y = self.jumpSpeed
+            self.canJumpOnLeft = True
+            self.canJumpOnRight = True
+            self.canJump = False
 
-            elif self.collisionDroite or self.collisionGauche:
-                # on saute
-                self.direction.y = self.jumpSpeed
+        elif self.collideOnLeft and self.canJumpOnLeft:
+            self.direction.y = self.jumpSpeed
+            self.canJumpOnLeft = False
+            self.canJumpOnRight = True
 
-        self.canJump = False
+        elif self.collideOnRight and self.canJumpOnRight:
+            self.direction.y = self.jumpSpeed
+            self.canJumpOnRight = False
+            self.canJumpOnLeft = True
+
+    def ladderClimb(self):
+        if self.collisionLadder:
+            self.direction.y = self.jumpSpeed
+
+    def respawnLastCheckpoint(self):
+        self.rect.x = self.lastCheckpoint.rect.x
+        self.rect.y = self.lastCheckpoint.rect.y
 
     def update(self, shift):
         self.getInput()

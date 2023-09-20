@@ -90,6 +90,7 @@ def pause():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     paused = False  # Mettre paused à False pour reprendre le jeu
+
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     for button in menuPause.buttons:
