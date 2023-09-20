@@ -49,7 +49,6 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.direction.y
 
     def jump(self):
-        print(self.collideOnRight)
         if self.onGround and self.canJump:
             self.direction.y = self.jumpSpeed
             self.canJumpOnLeft = True
