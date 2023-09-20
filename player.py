@@ -24,6 +24,8 @@ class Player(pygame.sprite.Sprite):
         self.collisionGauche= False
         self.collisionDroite= False
 
+        self.collisionLadder = False
+
     def getInput(self):
         keys = pygame.key.get_pressed()
 
@@ -33,6 +35,8 @@ class Player(pygame.sprite.Sprite):
             self.direction.x = 1
         else:
             self.direction.x = 0
+        if keys[pygame.K_UP] or keys[pygame.K_z]:
+            self.ladderClimb()
 
         if keys[pygame.K_SPACE]:
             self.jump()
@@ -47,12 +51,25 @@ class Player(pygame.sprite.Sprite):
             if self.onGround:
                 self.direction.y = self.jumpSpeed
                 self.lastJump = "sol"
-
-            elif self.collisionDroite or self.collisionGauche:
-                # on saute
+            # wall jump depuis un mur de droite ne peut pas wall jump 2 fois d'un mur de droite à la suite
+            elif self.collisionDroite and self.lastJump != "droite":
+                self.lastJump = "droite"
+                self.direction.y = self.jumpSpeed
+            # wall jump depuis un mur de gauche ne peut pas wall jump 2 fois d'un mur de gauche à la suite
+            elif self.collisionGauche and self.lastJump != "gauche":
+                self.lastJump = "gauche"
                 self.direction.y = self.jumpSpeed
 
-        self.canJump = False
+    def ladderClimb(self):
+        if self.collisionLadder:
+            self.direction.y = self.jumpSpeed
+
+
+
+
+
+
+
 
     def update(self, shift):
         self.getInput()
