@@ -52,6 +52,7 @@ def run():
         screen.blit(current, (10, 10))
         screen.blit(best, (10, 50))
 
+
         pygame.display.update()
         clock.tick(60)  # limiter à 60fps
     pygame.quit()
@@ -99,8 +100,12 @@ def resume():
     unpause()
 
 
-def quit():
+def quitGame():
     mainMenu()
+
+def quit():
+    pygame.quit()
+    sys.exit()
 
 
 def mainMenu():
@@ -128,18 +133,29 @@ def mainMenu():
         # Mettre à jour l'affichage
         pygame.display.flip()
 
+# Créer le menu principal et ses boutons
 
-# Créer le menu et les boutons
 menu = Menu()
-buttonPlay = Button(screenWidth // 2 - 150, screenHeight // 2, 300, 75, "Jouer", 'black', 'white', startGame)
-menu.addButton(buttonPlay)
 
-# Créer le menu pause et les boutons
+buttonPlay = Button(screenWidth // 2 - 150, screenHeight // 2 - 70, 300, 75, "Jouer", 'black', 'white', startGame)
+
+menu.addButton(buttonPlay) # Ajoute le bouton au menu
+
+buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 70, 300, 75, "Quitter", 'black', 'white', quit)
+
+menu.addButton(buttonQuit) # Ajoute le bouton au menu
+
+# Créer le menu pause et ses boutons
+
 menuPause = Menu()
-buttonResume = Button(screenWidth // 2 - 150, screenHeight // 2 - 50, 300, 75, "Reprendre", 'black', 'white', resume)
-buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 50, 300, 75, "Quitter", 'black', 'white', quit)
-menuPause.addButton(buttonResume)
-menuPause.addButton(buttonQuit)
+
+buttonResume = Button(screenWidth // 2 - 150, screenHeight // 2 - 50, 300, 75, "Reprendre", 'black', 'white', unpause)
+
+menuPause.addButton(buttonResume) # Ajoute le bouton au menu
+
+buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 50, 300, 75, "Quitter", 'black', 'white', quitGame)
+
+menuPause.addButton(buttonQuit) # Ajoute le bouton au menu
 
 # Démarrer le menu principal
 mainMenu()
