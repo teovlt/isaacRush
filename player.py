@@ -3,11 +3,12 @@ import pygame
 from settings import tileSize
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, level):
         super().__init__()
         self.image = pygame.Surface((tileSize/2,tileSize))
         self.image.fill("red")
         self.rect = self.image.get_rect(topleft = pos)
+        self.level = level
 
         # déplacements
         self.direction = pygame.Vector2(0, 0)
@@ -29,6 +30,8 @@ class Player(pygame.sprite.Sprite):
     def getInput(self):
         keys = pygame.key.get_pressed()
 
+
+
         if keys[pygame.K_LEFT] or keys[pygame.K_q]:
             self.direction.x = -1
         elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
@@ -40,6 +43,10 @@ class Player(pygame.sprite.Sprite):
 
         if keys[pygame.K_SPACE]:
             self.jump()
+
+        if keys[pygame.K_e]:
+            self.level.antigravite()
+
 
 
     def applyGravity(self):
