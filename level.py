@@ -196,7 +196,10 @@ class Level:
 
 
     def run(self):
+        # camera
         self.scrollX()
+        self.cameraFollowPlayer()
+
         # updates
         self.tiles.update(self.worldShift)
         self.npcs.update(self.worldShift)
@@ -214,5 +217,3 @@ class Level:
         self.npcs.draw(self.displaySurface)
         self.npcHorizontalMovementCollision()
         self.npcVerticalMovementCollision()
-        
-        self.cameraFollowPlayer()
