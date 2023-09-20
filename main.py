@@ -6,7 +6,7 @@ from menu import Menu, Button, displayText
 from settings import *
 from timer import Timer
 import time
-import pandas as pd
+import pandas
 
 # Initialisation de Pygame
 pygame.init()
@@ -15,7 +15,7 @@ clock = pygame.time.Clock()
 
 timer = Timer()
 
-df = pd.read_excel('map.ods')
+df = pandas.read_excel('map.ods')
 df.to_csv('map.csv', header=False, index=False)
 level = Level(screen, "./map.csv")
 pygame.display.set_caption("")
@@ -30,6 +30,7 @@ pygame.display.set_caption("")
 # Music
 pygame.mixer.music.load("Audio/3.mp3")
 pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
+pygame.mixer.music.set_volume(.1)
 
 
 # Fonction pour démarrer le jeu
