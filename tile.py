@@ -11,6 +11,7 @@ class Tile(pygame.sprite.Sprite):
         self.end = False
         self.powerup = False
         self.checkpoint = False
+        self.ladder = False
 
     def update(self, shift):
         self.rect.x += shift.x

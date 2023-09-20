@@ -24,6 +24,8 @@ class Player(pygame.sprite.Sprite):
         self.collisionGauche= False
         self.collisionDroite= False
 
+        self.collisionLadder = False
+
     def getInput(self):
         keys = pygame.key.get_pressed()
 
@@ -33,6 +35,8 @@ class Player(pygame.sprite.Sprite):
             self.direction.x = 1
         else:
             self.direction.x = 0
+        if keys[pygame.K_UP] or keys[pygame.K_z]:
+            self.ladderClimb()
 
         if keys[pygame.K_SPACE]:
             self.jump()
@@ -56,6 +60,9 @@ class Player(pygame.sprite.Sprite):
                 self.lastJump = "gauche"
                 self.direction.y = self.jumpSpeed
 
+    def ladderClimb(self):
+        if self.collisionLadder:
+            self.direction.y = self.jumpSpeed
 
 
 
