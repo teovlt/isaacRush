@@ -97,18 +97,18 @@ class Level:
                 # collisions gauche
                 if player.direction.x < 0:
                     player.rect.left = sprite.rect.right
-                    player.canJump = True
-                    player.collisionGauche = True
+                    self.currentX = player.rect.centerx
+                    player.collideOnLeft = True
                 # collisions droite
                 elif player.direction.x > 0:
                     player.rect.right = sprite.rect.left
-                    player.canJump = True
-                    player.collisionDroite = True
+                    self.currentX = player.rect.centerx
+                    player.collideOnRight = True
         # si le joueur bouge sur l'axe x , on considère qu'il n'est plus en collision avec le mur
-        if (player.collisionDroite and player.direction.x < 1) or (player.collisionGauche and player.direction.x > -1):
-            player.collisionDroite = False
-            player.collisionGauche = False
-
+        # print(f"Left: {player.collideOnLeft} - Right: {player.collideOnRight}")
+        if player.rect.centerx < self.currentX or player.rect.centerx > self.currentX:
+            player.collideOnLeft = False
+            player.collideOnRight = False
 
     def verticalMovementCollision(self):
         # gestion des collisions verticales
@@ -123,11 +123,11 @@ class Level:
                     player.direction.y = 0
                     player.onGround = True
                     player.canJump = True
-                    player.lastJump = "sol"
                 # plafond
                 elif player.direction.y < 0:
                     player.rect.top = sprite.rect.bottom
                     player.direction.y = 0
+
         if player.onGround and player.direction.y < 0 or player.direction.y > 1:
             player.onGround = False
 
@@ -136,8 +136,6 @@ class Level:
                 player.rect.bottom = npc.rect.top
                 player.direction.y = player.jumpSpeed / 2
                 npc.kill()
-
-
 
 
     def npcHorizontalMovementCollision(self):

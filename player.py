@@ -14,16 +14,15 @@ class Player(pygame.sprite.Sprite):
         self.speed = tileSize/8
         self.gravity = tileSize/80
         self.jumpSpeed = -tileSize/4
+        self.spacePressed = False
 
         # état
         self.onGround = False
         self.canJump = False
-
-        self.lastJump = "sol"
-
-        self.collisionGauche= False
-        self.collisionDroite= False
-
+        self.canJumpOnLeft = False
+        self.canJumpOnRight = False
+        self.collideOnLeft= False
+        self.collideOnRight= False
         self.collisionLadder = False
 
     def getInput(self):
@@ -35,41 +34,44 @@ class Player(pygame.sprite.Sprite):
             self.direction.x = 1
         else:
             self.direction.x = 0
+
+        if keys[pygame.K_SPACE] and not self.spacePressed:
+            self.jump()
+            self.spacePressed = True
+        elif not keys[pygame.K_SPACE]:
+            self.spacePressed = False
+
         if keys[pygame.K_UP] or keys[pygame.K_z]:
             self.ladderClimb()
-
-        if keys[pygame.K_SPACE]:
-            self.jump()
-
 
     def applyGravity(self):
         self.direction.y += self.gravity
         self.rect.y += self.direction.y
 
     def jump(self):
-        if self.canJump:
-            if self.onGround:
-                self.direction.y = self.jumpSpeed
-                self.lastJump = "sol"
-            # wall jump depuis un mur de droite ne peut pas wall jump 2 fois d'un mur de droite à la suite
-            elif self.collisionDroite and self.lastJump != "droite":
-                self.lastJump = "droite"
-                self.direction.y = self.jumpSpeed
-            # wall jump depuis un mur de gauche ne peut pas wall jump 2 fois d'un mur de gauche à la suite
-            elif self.collisionGauche and self.lastJump != "gauche":
-                self.lastJump = "gauche"
-                self.direction.y = self.jumpSpeed
+        print(self.collideOnRight)
+        if self.onGround and self.canJump:
+            self.direction.y = self.jumpSpeed
+            self.canJumpOnLeft = True
+            self.canJumpOnRight = True
+            self.canJump = False
+
+        elif self.collideOnLeft and self.canJumpOnLeft:
+            self.direction.y = self.jumpSpeed
+            self.canJumpOnLeft = False
+            self.canJumpOnRight = True
+
+        elif self.collideOnRight and self.canJumpOnRight:
+            self.direction.y = self.jumpSpeed
+            self.canJumpOnRight = False
+            self.canJumpOnLeft = True
+
+        else:
+            pass
 
     def ladderClimb(self):
         if self.collisionLadder:
             self.direction.y = self.jumpSpeed
-
-
-
-
-
-
-
 
     def update(self, shift):
         self.getInput()
