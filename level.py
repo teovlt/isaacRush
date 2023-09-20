@@ -66,7 +66,6 @@ class Level:
             if sprite.rect.colliderect(player.rect) and sprite.end:
                 self.setupLevel(self.csv)
                 self.finish = True
-                print("fini")
             # disable collisions powerup
             elif sprite.rect.colliderect(player.rect) and sprite.powerup:
                 print("powerup")
@@ -167,7 +166,8 @@ class Level:
                     npc.direction.y = 0
 
             if npc.rect.colliderect(player.rect):
-                     self.setupLevel(self.csv)
+                 self.setupLevel(self.csv)
+                 self.loose = True
 
     def scrollX(self):
         player = self.player.sprite
