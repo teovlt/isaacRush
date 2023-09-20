@@ -1,92 +1,89 @@
 import pygame as pg
+import game
 
+# Initialisation de Pygame
+pg.init()
+
+# Définir les dimensions de la fenêtre
+widthScreen, heightScreen = 1280, 720
+screen = pg.display.set_mode((widthScreen, heightScreen))
+pg.display.set_caption("Menu Mystère")
+
+# Classe pour représenter un bouton
+class Button():
+    def __init__(self, x, y, widthButton, heightButton, text, colorText, colorBackground, action=None):
+        self.rect = pg.Rect(x, y, widthButton, heightButton)
+        self.text = text
+        self.colorText = colorText
+        self.colorBackground = colorBackground
+        self.action = action
+
+    def displayButton(self, screen):
+        pg.draw.rect(screen, self.colorBackground, self.rect)
+        displayText(self.text, 36, self.rect.centerx, self.rect.centery, self.colorText)
+
+# Classe pour représenter le menu
 class Menu():
     def __init__(self):
-        pg.init()
-        screen = pg.display.set_mode((1280, 720))
-        clock = pg.time.Clock()
-        pg.display.set_caption('Menu')
-        running = True
-        dt = 0
-        mainMenu = False
-        font = pg.font.Font('freesansbold.ttf', 24)
-        menu_command = 0
+        self.buttons = []
 
-        class Button:
-            def __init__(self, txt, pos):
-                self.text = txt
-                self.pos = pos
-                self.button = pg.rect.Rect((self.pos[0], self.pos[1]),(268,40))
+    def addButton(self, button):
+        self.buttons.append(button)
 
-            def checkClicker(self):
+    def displayButton(self, screen):
+        for button in self.buttons:
+            button.displayButton(screen)
 
-            def draw(self):
-                pg.draw.rect(screen, 'light gray', self.button, 0, 5)
-                pg.draw.rect(screen, 'dark gray', [self.pos[0], self.pos[1], 260, 40], 5, 5)
-                text2 = font.render(self.text, True, 'black')
-                screen.blit(text2, (self.pos[0] + 15, self.pos[1] + 7))
+# Fonction pour afficher du texte sur l'écran
+def displayText(text, size, x, y, color):
+    police = pg.font.SysFont('Times New Roman', size)
+    textSurface = police.render(text, True, color)
+    textRect = textSurface.get_rect()
+    textRect.center = (x, y)
+    screen.blit(textSurface, textRect)
 
+# Boucle de jeu
+running = True
+while running:
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            running = False
 
-        def drawGame():
-            menu_btn = Button('Main Menu', (230, 450))
-            menu_btn.draw()
-            menu = menu_btn.checkClicked()
-            return menu
-
-        def drawMenu():
-            command = -1
-            pg.draw.rect(screen, 'black', [100, 100, 300, 300])
-            pg.draw.rect(screen, 'green', [100, 100, 300, 300], 5)
-            pg.draw.rect(screen, 'white', [120, 120, 260, 40], 0, 5)
-            pg.draw.rect(screen, 'gray', [120, 120, 260, 40], 5, 5)
-            txt = font.render('Menus Tutorial!', True, 'black')
-            screen.blit(txt, (135, 127))
-            # menu exit button
-            menu = Button('Exit Menu', (120, 350))
-            menu.draw()
-            button1 = Button('Button 1', (120, 180))
-            button1.draw()
-            button2 = Button('Button 2', (120, 240))
-            button2.draw()
-            button3 = Button('Button 3', (120, 300))
-            button3.draw()
-            if menu.checkClicked():
-                command = 0
-            if button1.checkClicked():
-                command = 1
-            if button2.checkClicked():
-                command = 2
-            if button3.checkClicked():
-                command = 3
-            return command
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                for button in menu.buttons:
+                    if button.rect.collidepoint(event.pos):
+                        if button.action:
+                            button.action()
 
 
-        while running:
-            # poll for events
-            # pygame.QUIT event means the user clicked X to close your window
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    running = False
+    # Action à effectuer lorsque le bouton "Jouer" est cliqué
+    def actionPlay():
+        game.Game()  # Exécute la fonction principale du module de jeu
 
-            # fill the screen with a color to wipe away anything from last frame
-            screen.fill("black")
 
-            if mainMenu:
-                menu_command = drawMenu()
-                if menu_command != -1:
-                    main_menu = False
-            else:
-                mainMenu = drawGame()
-                if menu_command > 0:
-                    text = font.render(f'Button {menu_command} pressed!', True, 'black')
-                    screen.blit(text, (150, 100))
+    # Créer le menu et les boutons
+    menu = Menu()
 
-            # flip() the display to put your work on screen
-            pg.display.flip()
+    buttonPlay = Button(widthScreen // 2 - 150, heightScreen // 2, 300, 75, "Jouer", 'black', 'white', actionPlay)
+    menu.addButton(buttonPlay)
 
-            # limits FPS to 60
-            # dt is delta time in seconds since last frame, used for framerate-
-            # independent physics.
-            dt = clock.tick(60) / 1000
+    #buttonSettings = Button(widthScreen/2-100, heightScreen/2, 200, 50, "Options", 'black', 'white')
+    #menu.addButton(buttonSettings)
 
-        pg.quit()
+
+
+    # Effacer l'écran
+    screen.fill('black')
+
+    # Afficher le titre du jeu
+    displayText("Menu Mystère", 100, widthScreen // 2, 150, 'white')
+
+    # Afficher le menu
+    menu.displayButton(screen)
+
+    # Mettre à jour l'affichage
+    pg.display.flip()
+
+# Quitter Pygame
+pg.quit()
