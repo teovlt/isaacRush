@@ -64,60 +64,6 @@ class Level:
     def blocCollision(self):
         inLadder = False
         player = self.player.sprite
-<<<<<<< HEAD
-        player.rect.x += player.direction.x * player.speed
-        for sprite in self.tiles.sprites():
-            # disable collisions end
-            if sprite.rect.colliderect(player.rect) and sprite.end:
-                self.setupLevel(self.csv)
-                self.finish = True
-            # disable collisions powerup
-            elif sprite.rect.colliderect(player.rect) and sprite.powerup:
-                print("powerup")
-            # disable collisions checkpoint
-            elif sprite.rect.colliderect(player.rect) and sprite.checkpoint:
-                print("checkpoint")
-            #collisions spike
-            elif sprite.rect.colliderect(player.rect) and sprite.deadly:
-                self.setupLevel(self.csv)
-                self.loose = True
-
-            elif sprite.rect.colliderect(player.rect):
-                # collisions gauche
-                if player.direction.x < 0:
-                    # blocage du joueur au niveau du bord droite du tile
-                    player.rect.left = sprite.rect.right
-                    # empêcher le joueur de sauter deux fois du même mur
-                    if player.lastJump != "gauche":
-                        player.canJump = True
-                    #le dernier saut a été fait depuis le mur gauche
-                    player.lastJump = "gauche"
-                    #le joueur est en collision avec le mur gauche
-                    player.collisionGauche = True
-                # collisions droite
-                elif player.direction.x > 0:
-                    # blocage du joueur au niveau du bord gauche du tile
-                    player.rect.right = sprite.rect.left
-                    # empêcher le joueur de sauter deux fois du même mur
-                    if player.lastJump != "droite":
-                        player.canJump = True
-                    # le dernier saut a été fait depuis le mur droit
-                    player.lastJump = "droite"
-                    # le joueur est en collision avec le mur droit
-                    player.collisionDroite = True
-        # print(player.direction.x)
-        # si le joueur bouge sur l'axe x , on considère qu'il n'est plus en collision avec le mur
-        if (player.collisionDroite and player.direction.x < 1) or (player.collisionGauche and player.direction.x > -1):
-            player.collisionDroite = False
-            player.collisionGauche = False
-
-
-    def verticalMovementCollision(self):
-        # gestion des collisions verticales
-        player = self.player.sprite
-        player.applyGravity()
-=======
->>>>>>> d14ca462bcb0a6e2a29b9276277fc7574cd49b19
         for sprite in self.tiles.sprites():
             # disable collisions end
             if sprite.rect.colliderect(player.rect) and sprite.end:
@@ -132,10 +78,6 @@ class Level:
             # collisions spike
             elif sprite.rect.colliderect(player.rect) and sprite.deadly:
                 self.setupLevel(self.csv)
-<<<<<<< HEAD
-                self.loose = True
-
-=======
                 # collisions tiles
                 self.finish = True
             elif sprite.rect.colliderect(player.rect) and sprite.ladder:
@@ -173,7 +115,6 @@ class Level:
         player = self.player.sprite
         player.applyGravity()
         for sprite in self.tiles.sprites():
->>>>>>> d14ca462bcb0a6e2a29b9276277fc7574cd49b19
             # collisions tiles
             if sprite.rect.colliderect(player.rect) and not (sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
                 # sol
