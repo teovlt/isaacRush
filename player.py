@@ -46,9 +46,6 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_UP] or keys[pygame.K_z]:
             self.ladderClimb()
 
-        if keys[pygame.K_SPACE]:
-            self.jump()
-
         if keys[pygame.K_e]:
             self.level.antigravite()
 
