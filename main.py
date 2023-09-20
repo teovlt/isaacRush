@@ -5,6 +5,7 @@ from level import Level
 from menu import Menu, Button, displayText
 from settings import *
 from timer import Timer
+import time
 
 # Initialisation de Pygame
 pygame.init()
@@ -30,38 +31,41 @@ def startGame():
 # cycle du jeu
 def run():
     running = True
+    timer.start()
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 pause()
+                timer.startTime = time.monotonic() - elapsed_time
 
-        screen.fill("black")
 
+        current_time = time.monotonic()
+        elapsed_time = current_time - timer.startTime
 
-        currentTime = pygame.time.get_ticks() - timer.startTime
         # Verification timer
         if timer.bestTime is None or level.finish:
             timer.start()
-            timer.update_best_time(currentTime)
+            timer.update_best_time(elapsed_time)
             level.finish = False
-
-        if level.loose:
+            timer.update_best_time(elapsed_time)
+        elif level.loose:
             timer.start()
             level.loose = False
 
-        print(currentTime)
+        screen.fill("black")
         level.run()
-        current = timer.drawCurrent()
+        #Affichage du temps
+        current = timer.drawCurrent(elapsed_time)
         best = timer.drawBest()
         screen.blit(current, (10, 10))
         screen.blit(best, (10, 50))
 
         pygame.display.update()
         clock.tick(60)  # limiter à 60fps
+
     pygame.quit()
 
 
@@ -95,6 +99,7 @@ def pause():
 def unpause():
     # Efface le menu pause
     screen.fill('black')
+    isTiming = True
 
     # Reprend le jeu
     run()
