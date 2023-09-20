@@ -141,8 +141,15 @@ class Level:
         if player.onGround and player.direction.y < 0 or player.direction.y > 1:
             player.onGround = False
 
+        for npc in self.npcs.sprites():
+            if npc.rect.colliderect(player.rect) and player.direction.y > 0:
+                player.rect.bottom = npc.rect.top
+                player.direction.y = player.jumpSpeed / 2
+                npc.kill()
+
 
     def npcHorizontalMovementCollision(self):
+        player = self.player.sprite
         for npc in self.npcs.sprites():
             npc.rect.x += npc.direction.x * npc.speed
             for tile in self.tiles.sprites():
@@ -152,6 +159,10 @@ class Level:
                 elif tile.rect.colliderect(npc.rect) and npc.direction.x > 0:
                     npc.rect.right = tile.rect.left
                     npc.direction.x = -1
+
+            if npc.rect.colliderect(player.rect):
+                self.setupLevel(self.csv)
+                self.finish = True
 
 
     def npcVerticalMovementCollision(self):
@@ -201,23 +212,23 @@ class Level:
 
 
     def run(self):
-        self.scrollX()
         # updates
         self.tiles.update(self.worldShift)
         self.npcs.update(self.worldShift)
         self.player.update(self.worldShift)
-        
-        # tiles
+
         self.tiles.draw(self.displaySurface)
+        self.player.draw(self.displaySurface)
+        self.npcs.draw(self.displaySurface)
 
         # player
-        self.player.draw(self.displaySurface)
         self.horizontalMovementCollision()
         self.verticalMovementCollision()
                                                                                 
         # npcs
-        self.npcs.draw(self.displaySurface)
         self.npcHorizontalMovementCollision()
         self.npcVerticalMovementCollision()
-        
+
+        # camera
+        self.scrollX()
         self.cameraFollowPlayer()

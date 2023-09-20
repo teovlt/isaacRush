@@ -1,52 +1,145 @@
 # main.py
-import pygame, sys
+import pygame
+import sys
 from level import Level
+from menu import Menu, Button, displayText
 from settings import *
-import pygame.mixer
 from timer import Timer
 
-# Pygame setup
+# Initialisation de Pygame
 pygame.init()
 screen = pygame.display.set_mode((screenWidth, screenHeight))
 clock = pygame.time.Clock()
 
 timer = Timer()
+current_time = pygame.time.get_ticks() - timer.startTime
 
 level = Level(screen, "./map.csv")
-pygame.display.set_caption("NOM DU JEU")
-#son
-pygame.mixer.init()
-pygame.mixer.music.load("Audio/3.mp3")
-pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
-
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-
-    screen.fill("black")
-
-    #Verification timer
-    current_time = pygame.time.get_ticks() - timer.startTime
-    if timer.bestTime is None or level.finish:
-        timer.start()
-        timer.update_best_time(current_time)
-        level.finish = False
-
-    if level.loose:
-        timer.start()
-        level.loose = False
 
 
-    level.run()
-    current = timer.drawCurrent()
-    best = timer.drawBest()
-    screen.blit(current, (10, 10))
-    screen.blit(best, (10, 50))
+# Fonction pour démarrer le jeu
+def startGame():
+    level.setupLevel("./map.csv")
+    run()
 
 
-    pygame.display.update()
-    clock.tick(60) # limiter à 60fps
+# cycle du jeu
+def run():
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                pause()
+        screen.fill("black")
+
+        # Verification timer
+        if timer.bestTime is None or level.finish:
+            timer.start()
+            timer.update_best_time(current_time)
+            level.finish = False
+
+        if level.loose:
+            timer.start()
+            level.loose = False
+
+        level.run()
+        current = timer.drawCurrent()
+        best = timer.drawBest()
+        screen.blit(current, (10, 10))
+        screen.blit(best, (10, 50))
+
+        pygame.display.update()
+        clock.tick(60)  # limiter à 60fps
+    pygame.quit()
 
 
+def pause():
+    paused = True
+    while paused:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    paused = False  # Mettre paused à False pour reprendre le jeu
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    for button in menuPause.buttons:
+                        if button.rect.collidepoint(event.pos):
+                            if button.action:
+                                button.action()
+                                paused = False
+        screen.fill('#ffffff')
+        displayText(screen, "Pause", 150, screenWidth // 2, 200, 'black')
+
+
+
+        # Afficher le menu pause
+        menuPause.displayButtons(screen)
+
+        pygame.display.update()
+
+
+# Fonction pour reprendre le jeu depuis la pause
+def unpause():
+    # Efface le menu pause
+    screen.fill('black')
+
+
+    # Reprend le jeu
+    run()
+
+
+def resume():
+    unpause()
+
+
+def quit():
+    mainMenu()
+
+
+def mainMenu():
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                for button in menu.buttons:
+                    if button.rect.collidepoint(event.pos) and button.action:
+                        button.action()
+
+        # Effacer l'écran
+        screen.fill('black')
+
+        # Afficher le titre du jeu dans le menu
+        displayText(screen, "Menu Mystère", 100, screenWidth // 2, 150, 'white')
+
+        # Afficher le menu
+        menu.displayButtons(screen)
+
+        # Mettre à jour l'affichage
+        pygame.display.flip()
+
+
+# Créer le menu et les boutons
+menu = Menu()
+buttonPlay = Button(screenWidth // 2 - 150, screenHeight // 2, 300, 75, "Jouer", 'black', 'white', startGame)
+menu.addButton(buttonPlay)
+
+# Créer le menu pause et les boutons
+menuPause = Menu()
+buttonResume = Button(screenWidth // 2 - 150, screenHeight // 2 - 50, 300, 75, "Reprendre", 'black', 'white', resume)
+buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 50, 300, 75, "Quitter", 'black', 'white', quit)
+menuPause.addButton(buttonResume)
+menuPause.addButton(buttonQuit)
+
+# Démarrer le menu principal
+mainMenu()
