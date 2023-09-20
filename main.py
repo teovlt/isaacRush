@@ -148,28 +148,16 @@ def mainMenu():
 # Créer le menu principal et ses boutons
 menu = Menu()
 buttonPlay = Button(screenWidth // 2 - 150, screenHeight // 2 - 70, 300, 75, "Jouer", 'black', 'white', startGame)
-<<<<<<< HEAD
-menu.addButton(buttonPlay) # Ajoute le bouton au menu
-buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 70, 300, 75, "Quitter", 'black', 'white', quit)
-menu.addButton(buttonQuit) # Ajoute le bouton au menu
-=======
 menu.addButton(buttonPlay)  #  Ajoute le bouton au menu
 buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 70, 300, 75, "Quitter", 'black', 'white', quit)
 menu.addButton(buttonQuit)  #  Ajoute le bouton au menu
->>>>>>> ff368bca70c6d8793ca23677b226ec075d51a065
 
 # Créer le menu pause et ses boutons
 menuPause = Menu()
 buttonResume = Button(screenWidth // 2 - 150, screenHeight // 2 - 50, 300, 75, "Reprendre", 'black', 'white', unpause)
-<<<<<<< HEAD
-menuPause.addButton(buttonResume) # Ajoute le bouton au menu
-buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 50, 300, 75, "Quitter", 'black', 'white', quitGame)
-menuPause.addButton(buttonQuit) # Ajoute le bouton au menu
-=======
 menuPause.addButton(buttonResume)  #  Ajoute le bouton au menu
 buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 50, 300, 75, "Quitter", 'black', 'white', quitGame)
 menuPause.addButton(buttonQuit)  #  Ajoute le bouton au menu
->>>>>>> ff368bca70c6d8793ca23677b226ec075d51a065
 
 # Démarrer le menu principal
 mainMenu()
