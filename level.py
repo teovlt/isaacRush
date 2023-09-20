@@ -204,14 +204,14 @@ class Level:
 
 
     def run(self): 
-        self.tiles.draw(self.displaySurface)
-        self.player.draw(self.displaySurface)
-        self.npcs.draw(self.displaySurface)
-
         # updates
         self.tiles.update(self.worldShift)
         self.npcs.update(self.worldShift)
         self.player.update(self.worldShift)
+
+        self.tiles.draw(self.displaySurface)
+        self.player.draw(self.displaySurface)
+        self.npcs.draw(self.displaySurface)
 
         # player
         self.horizontalMovementCollision()
