@@ -28,8 +28,7 @@ class Timer:
         best_time_text = font.render(best_time_str, True, "white")
         return best_time_text
 
-    def stop(self):
-        current_time = pygame.time.get_ticks() - self.startTime
-        tempo = current_time
-        return tempo
+    def stop(self, currenTime):
+        saveTime = currenTime
+        return saveTime
 
