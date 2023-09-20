@@ -7,6 +7,7 @@ from tile import Tile
 from player import Player
 from npc import Npc
 from spike import Spike
+from end import End
 
 
 class Level:
@@ -138,8 +139,6 @@ class Level:
 
 
     def npcHorizontalMovementCollision(self):
-        player = self.player.sprite
-
         for npc in self.npcs.sprites():
             npc.rect.x += npc.direction.x * npc.speed
             for tile in self.tiles.sprites():
@@ -149,9 +148,6 @@ class Level:
                 elif tile.rect.colliderect(npc.rect) and npc.direction.x > 0:
                     npc.rect.right = tile.rect.left
                     npc.direction.x = -1
-
-                if npc.rect.colliderect(player.rect):
-                     self.setupLevel(self.csv)
 
 
     def npcVerticalMovementCollision(self):
@@ -164,6 +160,9 @@ class Level:
                 if tile.rect.colliderect(npc.rect):
                     npc.rect.bottom = tile.rect.top
                     npc.direction.y = 0
+
+            if npc.rect.colliderect(player.rect):
+                     self.setupLevel(self.csv)
 
     def scrollX(self):
         player = self.player.sprite
