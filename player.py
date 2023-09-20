@@ -18,13 +18,13 @@ class Player(pygame.sprite.Sprite):
         # état
         self.onGround = False
         self.canJump = False
-
         self.lastJump = "sol"
 
         self.collisionGauche= False
         self.collisionDroite= False
-
         self.collisionLadder = False
+
+        self.lastCheckpoint = None
 
     def getInput(self):
         keys = pygame.key.get_pressed()
@@ -64,7 +64,10 @@ class Player(pygame.sprite.Sprite):
         if self.collisionLadder:
             self.direction.y = self.jumpSpeed
 
+    def respawnLastCheckpoint(self):
 
+        self.rect.x = self.lastCheckpoint.rect.x
+        self.rect.y = self.lastCheckpoint.rect.y
 
 
 

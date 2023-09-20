@@ -25,6 +25,7 @@ class Level:
         self.tiles = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
         self.npcs = pygame.sprite.Group()
+        self.player.lastCheckpoint = None
 
         file = open(csv, "r")
         rows = file.read().split("\n")
@@ -74,12 +75,14 @@ class Level:
                 print("powerup")
             # disable collisions checkpoint
             elif sprite.rect.colliderect(player.rect) and sprite.checkpoint:
-                print("checkpoint")
+                self.player.sprite.lastCheckpoint = sprite
             # collisions spike
             elif sprite.rect.colliderect(player.rect) and sprite.deadly:
-                self.setupLevel(self.csv)
+                if self.player.sprite.lastCheckpoint is None:
+                    self.setupLevel(self.csv)
+                else:
+                    self.player.sprite.respawnLastCheckpoint()
                 # collisions tiles
-                self.finish = True
             elif sprite.rect.colliderect(player.rect) and sprite.ladder:
                 player.collisionLadder = sprite.rect.colliderect(player.rect) and sprite.ladder
                 inLadder = True
