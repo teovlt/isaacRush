@@ -162,7 +162,7 @@ class Level:
 
             if npc.rect.colliderect(player.rect):
                 self.setupLevel(self.csv)
-                self.finish = True
+                self.loose = True
 
 
     def npcVerticalMovementCollision(self):
