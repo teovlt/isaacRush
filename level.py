@@ -16,20 +16,20 @@ class Level:
     def __init__(self, surface, csv):
         self.csv = csv
         self.displaySurface = surface
-        self.setupLevel(csv)
+        self.setupLevel()
         self.worldShift = pygame.math.Vector2(0,0)
         self.currentX = 0
         self.finish = False
         self.loose = False
 
-    def setupLevel(self, csv):
+    def setupLevel(self):
         self.tiles = pygame.sprite.Group()
         self.gravitiles = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
         self.npcs = pygame.sprite.Group()
         self.player.lastCheckpoint = None
 
-        file = open(csv, "r")
+        file = open(self.csv, "r")
         rows = file.read().split("\n")
         rows.pop()  # Supprimer la dernière ligne vide
 
@@ -74,7 +74,7 @@ class Level:
         for sprite in self.tiles.sprites():
             # disable collisions end
             if sprite.rect.colliderect(player.rect) and sprite.end:
-                self.setupLevel(self.csv)
+                self.setupLevel()
                 self.finish = True
             # disable collisions powerup
             elif sprite.rect.colliderect(player.rect) and sprite.powerup:
@@ -85,7 +85,7 @@ class Level:
             # collisions spike
             elif sprite.rect.colliderect(player.rect) and sprite.deadly:
                 if self.player.sprite.lastCheckpoint is None:
-                    self.setupLevel(self.csv)
+                    self.setupLevel()
                 else:
                     self.player.sprite.respawnLastCheckpoint()
                 # collisions tiles
@@ -166,7 +166,7 @@ class Level:
                     npc.direction.x = -1
 
             if npc.rect.colliderect(player.rect):
-                self.setupLevel(self.csv)
+                self.setupLevel()
                 self.finish = True
 
     def npcVerticalMovementCollision(self):
@@ -178,7 +178,7 @@ class Level:
                     npc.rect.bottom = tile.rect.top
                     npc.direction.y = 0
             if npc.rect.colliderect(player.rect):
-                 self.setupLevel(self.csv)
+                 self.setupLevel()
                  self.loose = True
 
     def antigravite(self):
