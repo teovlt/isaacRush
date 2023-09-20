@@ -1,6 +1,9 @@
 # player.py
 import pygame
 from settings import tileSize
+from timer import Timer
+
+timer = Timer()
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, level):
@@ -29,6 +32,9 @@ class Player(pygame.sprite.Sprite):
 
     def getInput(self):
         keys = pygame.key.get_pressed()
+
+        if keys:
+            timer.start()
 
         if keys[pygame.K_LEFT] or keys[pygame.K_q]:
             self.direction.x = -1
