@@ -86,6 +86,7 @@ class Level:
             elif sprite.rect.colliderect(player.rect) and sprite.deadly:
                 if self.player.sprite.lastCheckpoint is None:
                     self.setupLevel(self.csv)
+                    self.loose = True
                 else:
                     self.player.sprite.respawnLastCheckpoint()
                 # collisions tiles
@@ -144,6 +145,7 @@ class Level:
                 player.rect.bottom = npc.rect.top
                 player.direction.y = player.jumpSpeed / 2
                 npc.kill()
+                self.loose = True
 
     def gravitileVerticalMovementCollision(self):
         for gravitile in self.gravitiles.sprites():
