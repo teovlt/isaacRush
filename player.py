@@ -66,9 +66,6 @@ class Player(pygame.sprite.Sprite):
             self.canJumpOnRight = False
             self.canJumpOnLeft = True
 
-        else:
-            pass
-
     def ladderClimb(self):
         if self.collisionLadder:
             self.direction.y = self.jumpSpeed
