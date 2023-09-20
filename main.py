@@ -5,6 +5,7 @@ from level import Level
 from menu import Menu, Button, displayText
 from settings import *
 from timer import Timer
+import pandas as pd
 
 # Initialisation de Pygame
 pygame.init()
@@ -14,6 +15,8 @@ clock = pygame.time.Clock()
 timer = Timer()
 current_time = pygame.time.get_ticks() - timer.startTime
 
+df = pd.read_excel('map.ods')
+df.to_csv('map.csv', header=False, index=False)
 level = Level(screen, "./map.csv")
 
 
