@@ -30,9 +30,13 @@ while True:
     if startTime is None or level.finish:
         startTime = pygame.time.get_ticks()
         level.finish = False
-
         if current_time < bestTime or bestTime == 0:
             bestTime = current_time
+
+    if level.loose:
+        startTime = pygame.time.get_ticks()
+        level.loose = False
+
 
     level.run()
 
