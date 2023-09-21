@@ -15,7 +15,7 @@ class Timer:
 
     def drawCurrent(self, elapsed_time):
         font = pygame.font.Font(None, 36)
-        current_time_str = f"Time: {elapsed_time:.1f} s"
+        current_time_str = f"Time: {elapsed_time:.3f} s"
         current_time_text = font.render(current_time_str, True, "white")
         return current_time_text
     def drawBest(self):

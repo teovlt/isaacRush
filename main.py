@@ -18,6 +18,7 @@ if not "-c" in sys.argv:
 
 level = Level(screen, "./map.csv")
 pygame.display.set_caption("")
+pygame.mixer.music.set_volume(0.4)
 
 bg = pygame.image.load("Graphics/Backgrounds/bg.png")
 bg = pygame.transform.scale(bg, (screenWidth, screenHeight))
@@ -49,15 +50,14 @@ def run():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_c:
                 level.setupLevel()
                 level.loose = True
+                level.finish = False
+                # level.player.
 
         current_time = time.monotonic()
         elapsed_time = current_time - timer.startTime
 
         # Verification timer
         if timer.bestTime is None or level.finish:
-            timer.start()
-            timer.update_best_time(elapsed_time)
-            level.finish = False
             timer.update_best_time(elapsed_time)
         elif level.loose:
             timer.start()
@@ -123,7 +123,6 @@ def mainMenu():
     running = True
     pygame.mixer.music.load("Audio/menu.mp3")
     pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
-    pygame.mixer.music.set_volume(0.5)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

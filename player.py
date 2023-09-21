@@ -139,7 +139,10 @@ class Player(pygame.sprite.Sprite):
         self.level.resetCamera()
 
     def update(self, worldShift):
-        self.getInput()
+        if not self.level.finish:
+            self.getInput()
+        else:
+            self.direction.x = 0
         self.getStatus()
         self.animate()
         self.rect.y += worldShift.y

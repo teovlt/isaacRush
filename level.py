@@ -103,7 +103,11 @@ class Level:
         player = self.player.sprite
 
         if self.endsprite.sprite.rect.colliderect(player.rect) and self.endsprite.sprite.end:
-            self.setupLevel()
+            # son de fin
+            end = pygame.mixer.Sound("Audio/end.wav")
+            pygame.mixer.Channel(1).play(end)
+            # La fusée monte
+            self.endsprite.sprite.direction.y -= 0.1
             self.finish = True
 
         for sprite in self.powerups.sprites():
@@ -133,9 +137,8 @@ class Level:
         if not inLadder:
             player.collideOnLadder = False
 
-
     def movementCollision(self):
-    # gestion des collisions horizontales et verticales
+        # gestion des collisions horizontales et verticales
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
         listeSprites = []
@@ -220,9 +223,10 @@ class Level:
             if npc.rect.colliderect(player.rect) and player.direction.y > 0:
                 player.rect.bottom = npc.rect.top
                 player.direction.y = player.jumpSpeed / 2
+                # Son quand un npc est tué
+                killNpc = pygame.mixer.Sound("Audio/killNpc.wav")
+                pygame.mixer.Channel(1).play(killNpc)
                 npc.kill()
-
-
 
     def npcHorizontalMovementCollision(self):
         player = self.player.sprite
@@ -310,6 +314,13 @@ class Level:
 
 
     def run(self):
+        if self.finish:
+            self.endsprite.sprite.up()
+            if self.endsprite.sprite.rect.y <= -80:
+                self.setupLevel()
+                self.loose = True
+                self.finish = False
+
         # updates
         self.player.update(self.worldShift)
         self.tiles.update(self.worldShift)
@@ -329,14 +340,14 @@ class Level:
         self.powerups.draw(self.displaySurface)
         self.ladders.draw(self.displaySurface)
         self.endsprite.draw(self.displaySurface)
-        self.player.draw(self.displaySurface)
+        if not self.finish:
+            self.player.draw(self.displaySurface)
         self.npcs.draw(self.displaySurface)
 
         # gravitiles
         self.gravitileVerticalMovementCollision()
 
         # player
-        self.blocCollision()
         self.movementCollision()
 
         # npcs
