@@ -2,11 +2,14 @@
 import pygame
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, pos, size):
+    def __init__(self, pos, size, condition=False):
         super().__init__()
-        self.image = pygame.Surface((size, size))
-        self.image.fill('grey')
-        self.rect = self.image.get_rect(topleft = pos)
+        if condition:
+            self.image = pygame.image.load("Graphics/block.png")
+        else:
+            self.image = pygame.image.load("Graphics/block2.png")
+        self.image = pygame.transform.scale(self.image, (size, size))  # Redimensionner si nécessaire
+        self.rect = self.image.get_rect(topleft=pos)
         self.deadly = False
         self.end = False
         self.powerup = False
@@ -17,3 +20,4 @@ class Tile(pygame.sprite.Sprite):
     def update(self, shift):
         self.rect.x += shift.x
         self.rect.y += shift.y
+

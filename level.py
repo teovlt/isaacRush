@@ -17,13 +17,12 @@ class Level:
         self.csv = csv
         self.displaySurface = surface
         self.setupLevel()
-        self.worldShift = pygame.math.Vector2(0,0)
+        self.worldShift = pygame.math.Vector2(0, 0)
         self.currentX = 0
         self.finish = False
         self.loose = False
 
     def setupLevel(self):
-
         self.tiles = pygame.sprite.Group()
         self.gravitiles = pygame.sprite.Group()
         self.spikes = pygame.sprite.Group()
@@ -46,8 +45,11 @@ class Level:
                 cell = int(cell)
                 x = colIndex
                 y = rowIndex
-                if cell == 1:       # tile -> bloc de mur/sol
-                    tile = Tile((x * tileSize, y * tileSize), tileSize)
+                if cell == 1:  # tile -> bloc de mur/sol
+                    if int(rows[rowIndex - 1].split(",")[colIndex]) == 1:
+                        tile = Tile((x * tileSize, y * tileSize), tileSize, True)
+                    else:
+                        tile = Tile((x * tileSize, y * tileSize), tileSize, False)
                     self.tiles.add(tile)
                 elif cell == 2:     # Joueur
                     player_sprite = Player((x * tileSize, y * tileSize), self)
@@ -110,8 +112,6 @@ class Level:
 
         if not inLadder:
             player.collideOnLadder = False
-
-
 
     def horizontalMovementCollision(self):
         # gestion des collisions horizontales

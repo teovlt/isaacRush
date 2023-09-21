@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = pos)
     
     def importCharacterAssets(self):
-        characterPath = "./graphics/character/"
+        characterPath = "./Graphics/Character/"
         self.animations = {"idle": [], "run": [], "jump": [], "fall": []}
 
         for animation in self.animations.keys():
