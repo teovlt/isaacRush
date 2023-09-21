@@ -155,6 +155,13 @@ class Level:
                 elif tile.rect.colliderect(npc.rect) and npc.direction.x > 0:
                     npc.rect.right = tile.rect.left
                     npc.direction.x = -1
+            for npc2 in self.npcs.sprites():
+                if npc2.rect.colliderect(npc.rect) and npc.direction.x < 0 and npc != npc2:
+                    npc.rect.left = tile.rect.right
+                    npc.direction.x = 1
+                elif npc2.rect.colliderect(npc.rect) and npc.direction.x > 0 and npc != npc2:
+                    npc.rect.right = tile.rect.left
+                    npc.direction.x = -1
 
             if npc.rect.colliderect(player.rect):
                 self.player.sprite.die()
