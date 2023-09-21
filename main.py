@@ -20,7 +20,7 @@ level = Level(screen, "./map.csv")
 pygame.display.set_caption("")
 
 bg = pygame.image.load("Graphics/Backgrounds/bg.png")
-bgA = pygame.transform.scale(bg, (screenWidth, screenHeight))
+bg = pygame.transform.scale(bg, (screenWidth, screenHeight))
 
 
 # Music
@@ -64,7 +64,7 @@ def run():
             level.loose = False
 
         screen.fill('black')
-        screen.blit(bgA, (0, 0))
+        screen.blit(bg, (0, 0))
         level.run()
         # Affichage du temps
         current = timer.drawCurrent(elapsed_time)
