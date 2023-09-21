@@ -86,7 +86,7 @@ class Player(pygame.sprite.Sprite):
         elif not keys[pygame.K_SPACE]:
             self.spacePressed = False
 
-        if keys[pygame.K_UP] or keys[pygame.K_z]:
+        if keys[pygame.K_UP] or keys[pygame.K_z] or keys[pygame.K_SPACE]:
             self.ladderClimb()
 
         if keys[pygame.K_e]:
