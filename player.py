@@ -32,7 +32,7 @@ class Player(pygame.sprite.Sprite):
         # animations
         self.importCharacterAssets()
         self.frameIndex = 0
-        self.animationSpeed = 0.1
+        self.animationSpeed = 0.15
         self.status = "idle"
         self.facingRight = False
 
