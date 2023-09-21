@@ -4,6 +4,7 @@ from level import Level
 from menu import Menu, Button, displayText
 from settings import *
 from timer import Timer
+from utils import importFolder
 
 # Initialisation de Pygame
 pygame.init()
@@ -23,9 +24,7 @@ pygame.mixer.music.set_volume(0.4)
 bg = pygame.image.load("Graphics/Backgrounds/bg.png")
 bg = pygame.transform.scale(bg, (screenWidth, screenHeight))
 
-
-# Music
-
+keys = pygame.image.load("Graphics/Keys/keys.svg")
 
 # Fonction pour démarrer le jeu
 def startGame():
@@ -33,13 +32,15 @@ def startGame():
     timer.start()
     run()
 
-
 # cycle du jeu
-def run():
+def run():    
     running = True
     pygame.mixer.music.load("Audio/game.mp3")
     pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
     while running:
+        current_time = time.monotonic()
+        elapsed_time = current_time - timer.startTime
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -51,10 +52,6 @@ def run():
                 level.setupLevel()
                 level.loose = True
                 level.finish = False
-                # level.player.
-
-        current_time = time.monotonic()
-        elapsed_time = current_time - timer.startTime
 
         # Verification timer
         if timer.bestTime is None or level.finish:
@@ -71,6 +68,7 @@ def run():
         best = timer.drawBest()
         screen.blit(current, (10, 10))
         screen.blit(best, (10, 50))
+        screen.blit(keys, (10, screenHeight - keys.get_rect().height - 10))
 
         pygame.display.update()
         clock.tick(60)  # limiter à 60fps
@@ -149,9 +147,11 @@ def mainMenu():
 
 # Créer le menu principal et ses boutons
 menu = Menu()
-buttonPlay = Button(screenWidth // 2 - 150, screenHeight // 2 - 70, 300, 75, "Jouer", 'black', 'white', startGame)
+buttonPlay = Button(screenWidth // 2 - 150, screenHeight // 2 - 115, 300, 75, "Jouer", 'black', 'white', startGame)
 menu.addButton(buttonPlay)  #  Ajoute le bouton au menu
-buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 70, 300, 75, "Quitter", 'black', 'white', quit)
+buttonCredits = Button(screenWidth // 2 - 150, screenHeight // 2, 300, 75, "Crédits", 'black', 'white', startGame)
+menu.addButton(buttonCredits)   #  Ajoute le bouton au menu
+buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 115, 300, 75, "Quitter", 'black', 'white', quit)
 menu.addButton(buttonQuit)  #  Ajoute le bouton au menu
 
 # Créer le menu pause et ses boutons
