@@ -1,12 +1,9 @@
 # main.py
-import pygame
-import sys
+import pygame, sys, os, time, pandas
 from level import Level
 from menu import Menu, Button, displayText
 from settings import *
 from timer import Timer
-import time
-import pandas
 
 # Initialisation de Pygame
 pygame.init()
@@ -16,7 +13,7 @@ clock = pygame.time.Clock()
 timer = Timer()
 
 if not "-c" in sys.argv:
-    df = pandas.read_excel('map.ods')
+    df = pandas.read_excel('./map.ods')
     df.to_csv('map.csv', header=False, index=False)
 
 level = Level(screen, "./map.csv")

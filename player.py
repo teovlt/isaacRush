@@ -2,13 +2,14 @@
 import pygame
 from settings import tileSize, playerSpeed
 from timer import Timer
+from utils import importFolder
 
 timer = Timer()
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, level):
         super().__init__()
-        self.image = pygame.Surface((tileSize/2,tileSize))
+        self.image = pygame.Surface((tileSize,tileSize))
         self.image.fill("red")
         self.rect = self.image.get_rect(topleft = pos)
         self.level = level
@@ -31,6 +32,36 @@ class Player(pygame.sprite.Sprite):
         self.collideOnAntiGravity = False
         self.lastCheckpoint = None
 
+        # animations
+        self.importCharacterAssets()
+        self.frameIndex = 0
+        self.animationSpeed = 0.1
+        self.status = "idle"
+        self.facingRight = False
+    
+    def importCharacterAssets(self):
+        characterPath = "./graphics/character/"
+        self.animations = {"idle": [], "run": [], "jump": [], "fall": []}
+
+        for animation in self.animations.keys():
+            fullPath = characterPath + animation
+            self.animations[animation] = importFolder(fullPath)
+
+    def animate(self):
+        animation = self.animations[self.status]
+        self.frameIndex += self.animationSpeed
+        if self.frameIndex >= len(animation):
+            self.frameIndex = 0
+
+        image = animation[int(self.frameIndex)]
+        if self.facingRight:
+            self.image = image
+        else:
+            flippedImage = pygame.transform.flip(image, True, False)
+            self.image = flippedImage
+
+        self.rect = image.get_rect(bottomright = self.rect.bottomright)
+
     def getInput(self):
         keys = pygame.key.get_pressed()
 
@@ -39,8 +70,10 @@ class Player(pygame.sprite.Sprite):
 
         if keys[pygame.K_LEFT] or keys[pygame.K_q]:
             self.direction.x = -1
+            self.facingRight = False
         elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.direction.x = 1
+            self.facingRight = True
         else:
             self.direction.x = 0
 
@@ -57,6 +90,17 @@ class Player(pygame.sprite.Sprite):
 
         if keys[pygame.K_e]:
             self.level.antiGravite()
+
+    def getStatus(self):
+        if self.direction.y < 0:
+            self.status = "jump"
+        elif self.direction.y > 1:
+            self.status = "fall"
+        else:
+            if self.direction.x != 0:
+                self.status = "run"
+            else:
+                self.status = "idle"
 
     def applyGravity(self):
         self.direction.y += self.gravity
@@ -89,4 +133,6 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, shift):
         self.getInput()
+        self.getStatus()
+        self.animate()
         self.rect.y += shift.y
