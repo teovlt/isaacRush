@@ -18,14 +18,10 @@ if not "-c" in sys.argv:
 
 level = Level(screen, "./map.csv")
 pygame.display.set_caption("")
-# bg = pygame.image.load("Graphics/Backgrounds/RTB_v1.0/background.png")
-# bg2 = pygame.image.load("Graphics/Backgrounds/RTB_v1.0/background2.png")
-# bg3 = pygame.image.load("Graphics/Backgrounds/RTB_v1.0/background3.png")
-# bg4 = pygame.image.load("Graphics/Backgrounds/RTB_v1.0/background4.png")
-# bgA = pygame.transform.scale(bg, (1280, 720))
-# bgB = pygame.transform.scale(bg2, (1280, 720))
-# bgC = pygame.transform.scale(bg3, (1280, 720))
-# bgD = pygame.transform.scale(bg3, (1280, 720))
+
+bg = pygame.image.load("Graphics/Backgrounds/bg.png")
+bgA = pygame.transform.scale(bg, (1280, 720))
+
 # Music
 pygame.mixer.music.load("Audio/3.mp3")
 pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
@@ -69,10 +65,7 @@ def run():
             level.loose = False
 
         screen.fill('black')
-        # screen.blit(bgA,(0, 0))
-        # screen.blit(bgB,(0, 0))
-        # screen.blit(bgC,(0, 0))
-        # screen.blit(bgD,(0, 0))
+        screen.blit(bgA,(0, 0))
         level.run()
         # Affichage du temps
         current = timer.drawCurrent(elapsed_time)
@@ -84,6 +77,7 @@ def run():
         clock.tick(60)  # limiter à 60fps
 
     pygame.quit()
+
 
 
 def pause():
@@ -115,8 +109,7 @@ def pause():
 
 # Fonction pour reprendre le jeu depuis la pause
 def unpause():
-    # Efface le menu pause
-    screen.fill('black')
+    pass
 
 def quitGame():
     mainMenu()
