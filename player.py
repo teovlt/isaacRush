@@ -1,13 +1,17 @@
 # player.py
 import pygame
 from settings import tileSize
+from timer import Timer
+
+timer = Timer()
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, level):
         super().__init__()
         self.image = pygame.Surface((tileSize/2,tileSize))
         self.image.fill("red")
         self.rect = self.image.get_rect(topleft = pos)
+        self.level = level
 
         # déplacements
         self.direction = pygame.Vector2(0, 0)
@@ -24,9 +28,13 @@ class Player(pygame.sprite.Sprite):
         self.collideOnLeft= False
         self.collideOnRight= False
         self.collisionLadder = False
+        self.lastCheckpoint = None
 
     def getInput(self):
         keys = pygame.key.get_pressed()
+
+        if keys:
+            timer.start()
 
         if keys[pygame.K_LEFT] or keys[pygame.K_q]:
             self.direction.x = -1
@@ -43,6 +51,9 @@ class Player(pygame.sprite.Sprite):
 
         if keys[pygame.K_UP] or keys[pygame.K_z]:
             self.ladderClimb()
+
+        if keys[pygame.K_e]:
+            self.level.antigravite()
 
     def applyGravity(self):
         self.direction.y += self.gravity
@@ -68,6 +79,10 @@ class Player(pygame.sprite.Sprite):
     def ladderClimb(self):
         if self.collisionLadder:
             self.direction.y = self.jumpSpeed
+
+    def respawnLastCheckpoint(self):
+        self.rect.x = self.lastCheckpoint.rect.x
+        self.rect.y = self.lastCheckpoint.rect.y
 
     def update(self, shift):
         self.getInput()
