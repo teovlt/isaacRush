@@ -21,8 +21,7 @@ class Player(pygame.sprite.Sprite):
         # état
         self.onGround = False
         self.canJump = False
-        self.canJumpOnLeft = False
-        self.canJumpOnRight = False
+        self.lastJumpX = None
         self.collideOnLeft= False
         self.collideOnRight= False
         self.collideOnLadder = False
@@ -114,15 +113,13 @@ class Player(pygame.sprite.Sprite):
             self.canJumpOnRight = True
             self.canJump = False
 
-        elif self.collideOnLeft and self.canJumpOnLeft:
+        elif self.collideOnLeft and self.lastJumpX != self.rect.centerx:
             self.direction.y = self.jumpSpeed
-            self.canJumpOnLeft = False
-            self.canJumpOnRight = True
+            self.lastJumpX = self.rect.centerx
 
-        elif self.collideOnRight and self.canJumpOnRight:
+        elif self.collideOnRight and self.lastJumpX != self.rect.centerx:
             self.direction.y = self.jumpSpeed
-            self.canJumpOnRight = False
-            self.canJumpOnLeft = True
+            self.lastJumpX = self.rect.centerx
 
     def ladderClimb(self):
         if self.collideOnLadder:

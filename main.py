@@ -22,9 +22,8 @@ pygame.display.set_caption("")
 bg = pygame.image.load("Graphics/Backgrounds/bg.png")
 bgA = pygame.transform.scale(bg, (1280, 720))
 
+
 # Music
-pygame.mixer.music.load("Audio/2.mp3")
-pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
 
 
 # Fonction pour démarrer le jeu
@@ -37,7 +36,8 @@ def startGame():
 # cycle du jeu
 def run():
     running = True
-
+    pygame.mixer.music.load("Audio/game.mp3")
+    pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -64,7 +64,7 @@ def run():
             level.loose = False
 
         screen.fill('black')
-        screen.blit(bgA,(0, 0))
+        screen.blit(bgA, (0, 0))
         level.run()
         # Affichage du temps
         current = timer.drawCurrent(elapsed_time)
@@ -76,7 +76,6 @@ def run():
         clock.tick(60)  # limiter à 60fps
 
     pygame.quit()
-
 
 
 def pause():
@@ -110,6 +109,7 @@ def pause():
 def unpause():
     pass
 
+
 def quitGame():
     mainMenu()
 
@@ -121,6 +121,8 @@ def quit():
 
 def mainMenu():
     running = True
+    pygame.mixer.music.load("Audio/menu.mp3")
+    pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

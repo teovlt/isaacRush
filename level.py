@@ -99,10 +99,15 @@ class Level:
 
         for sprite in self.checkpoints.sprites():
             if sprite.rect.colliderect(player.rect):
-                self.player.sprite.lastCheckpoint = sprite
-                image = pygame.image.load("Graphics/CheckPoints/flagPassed.png")
-                imageF = pygame.transform.scale(image, (80, 120))
-                sprite.image = imageF
+                if self.player.sprite.lastCheckpoint != sprite:
+                    self.player.sprite.lastCheckpoint = sprite
+                    image = pygame.image.load("Graphics/CheckPoints/flagPassed.png")
+                    imageF = pygame.transform.scale(image, (80, 120))
+                    sprite.image = imageF
+                    check = pygame.mixer.Sound("Audio/checkPoint.wav")
+                    pygame.mixer.Channel(1).play(check)
+
+
 
 
 
@@ -154,6 +159,7 @@ class Level:
                     player.direction.y = 0
                     player.onGround = True
                     player.canJump = True
+                    player.lastJumpX = None
                 # plafond
                 elif player.direction.y < 0:
                     player.rect.top = sprite.rect.bottom

@@ -6,8 +6,9 @@ from settings import tileSize
 class Npc(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
-        self.image = pygame.Surface((tileSize/2, tileSize/2))
-        self.image.fill("blue")
+
+        self.image = pygame.image.load("Graphics/Blocks/block.png")
+        self.image = pygame.transform.scale(self.image, (tileSize/2, tileSize/2))  # Redimensionner si nécessaire
         self.rect = self.image.get_rect(topleft=pos)
 
         # déplacements
