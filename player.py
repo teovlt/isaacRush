@@ -145,3 +145,4 @@ class Player(pygame.sprite.Sprite):
             self.level.loose = True
         else:
             self.respawnLastCheckpoint()
+            self.level.resetCamera()
