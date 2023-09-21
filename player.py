@@ -136,3 +136,10 @@ class Player(pygame.sprite.Sprite):
         self.getStatus()
         self.animate()
         self.rect.y += shift.y
+
+    def die(self):
+        if self.lastCheckpoint is None:
+            self.level.setupLevel()
+            self.level.loose = True
+        else:
+            self.respawnLastCheckpoint()
