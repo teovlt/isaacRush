@@ -282,6 +282,14 @@ class Level:
         else:
             self.worldShift.y = 0
 
+    def resetCamera(self):
+        player = self.player.sprite
+        playerPos = pygame.math.Vector2(player.rect.centerx, player.rect.centery)
+        screen = pygame.math.Vector2(screenWidth / 2, screenHeight / 2)
+        delta = pygame.math.Vector2(screen.x - playerPos.x, screen.y - playerPos.y)
+
+        self.worldShift = delta
+
     def run(self):
         # updates
         self.tiles.update(self.worldShift)
