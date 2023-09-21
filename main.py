@@ -23,9 +23,8 @@ bg = pygame.image.load("Graphics/Backgrounds/bg.png")
 bgA = pygame.transform.scale(bg, (1280, 720))
 
 # Music
-pygame.mixer.music.load("Audio/3.mp3")
+pygame.mixer.music.load("Audio/2.mp3")
 pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
-pygame.mixer.music.set_volume(.1)
 
 
 # Fonction pour démarrer le jeu

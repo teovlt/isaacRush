@@ -98,8 +98,13 @@ class Level:
                 print("powerup")
 
         for sprite in self.checkpoints.sprites():
-            if sprite.rect.colliderect(player.rect) and sprite.checkpoint:
+            if sprite.rect.colliderect(player.rect):
                 self.player.sprite.lastCheckpoint = sprite
+                image = pygame.image.load("Graphics/CheckPoints/flagPassed.png")
+                imageF = pygame.transform.scale(image, (80, 120))
+                sprite.image = imageF
+
+
 
         for sprite in self.spikes.sprites():
             if sprite.rect.colliderect(player.rect) and sprite.deadly:
