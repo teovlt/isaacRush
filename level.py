@@ -318,10 +318,6 @@ class Level:
                 sprite.rect.centerx += delta.x  # Update x position
                 # sprite.rect.top += delta.y  # Update y position
 
-        # Print debug information (optional)
-        print(f"Player x: {player_center.x}, y: {player_center.y}")
-        print(f"Delta x: {delta.x}, y: {delta.y}")
-
 
     def run(self):
         # updates
