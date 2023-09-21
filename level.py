@@ -1,6 +1,6 @@
 # level.py
 import pygame
-from settings import tileSize, screenWidth, screenHeight
+from settings import *
 from checkpoint import Checkpoint
 from powerup import Powerup
 from tile import Tile
@@ -25,8 +25,14 @@ class Level:
     def setupLevel(self):
         self.tiles = pygame.sprite.Group()
         self.gravitiles = pygame.sprite.Group()
+        self.spikes = pygame.sprite.Group()
+        self.powerups = pygame.sprite.Group()
+        self.checkpoints = pygame.sprite.Group()
+        self.ladders = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
+        self.endsprite = pygame.sprite.GroupSingle()
         self.npcs = pygame.sprite.Group()
+        self.collidTiles = [self.tiles, self.spikes]
         self.player.lastCheckpoint = None
 
         file = open(self.csv, "r")
@@ -45,57 +51,62 @@ class Level:
                     else:
                         tile = Tile((x * tileSize, y * tileSize), tileSize, False)
                     self.tiles.add(tile)
-                elif cell == 2:  # Joueur
+                elif cell == 2:     # Joueur
                     player_sprite = Player((x * tileSize, y * tileSize), self)
                     self.player.add(player_sprite)
-                elif cell == 3:  # spike -> pic
+                elif cell == 3:     # spike -> pic
                     spike = Spike((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(spike)
-                elif cell == 4:  # npc -> ennemi
+                    self.spikes.add(spike)
+                elif cell == 4:     # npc -> ennemi
                     npc = Npc((x * tileSize, y * tileSize + tileSize / 2))
                     self.npcs.add(npc)
-                elif cell == 5:  # fin
+                elif cell == 5:     # fin
                     end = End((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(end)
-                elif cell == 6:  # powerup
+                    self.endsprite.add(end)
+                elif cell == 6:     # powerup
                     powerup = Powerup((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(powerup)
-                elif cell == 7:  # checkpoint
+                    self.powerups.add(powerup)
+                elif cell == 7:     # checkpoint
                     checkpoint = Checkpoint((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(checkpoint)
-                elif cell == 8:  # échelle
+                    self.checkpoints.add(checkpoint)
+                elif cell == 8:     # échelle
                     ladder = Ladder((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(ladder)
-                elif cell == 9:  # bloc anti gravité
+                    self.ladders.add(ladder)
+                elif cell == 9:     # bloc anti gravité
                     gravitile = Gravitile((x * tileSize, y * tileSize), tileSize)
                     self.gravitiles.add(gravitile)
                     self.tiles.add(gravitile)
-
+        self.collidTiles[0] = self.tiles
+        self.collidTiles[1] = self.spikes
 
 
     def blocCollision(self):
         inLadder = False
         player = self.player.sprite
-        for sprite in self.tiles.sprites():
-            # disable collisions end
-            if sprite.rect.colliderect(player.rect) and sprite.end:
-                self.setupLevel()
-                self.finish = True
-            # disable collisions powerup
-            elif sprite.rect.colliderect(player.rect) and sprite.powerup:
+
+        if player.rect.colliderect(self.endsprite.sprite.rect):
+            self.setupLevel()
+            self.finish = True
+
+        for sprite in self.powerups.sprites():
+            if sprite.rect.colliderect(player.rect) and sprite.powerup:
                 print("powerup")
-            # disable collisions checkpoint
-            elif sprite.rect.colliderect(player.rect) and sprite.checkpoint:
+
+        for sprite in self.checkpoints.sprites():
+            if sprite.rect.colliderect(player.rect) and sprite.checkpoint:
                 self.player.sprite.lastCheckpoint = sprite
-            # collisions spike
-            elif sprite.rect.colliderect(player.rect) and sprite.deadly:
-                if self.player.sprite.lastCheckpoint is None:
-                    self.setupLevel()
-                    self.loose = True
-                else:
-                    self.player.sprite.respawnLastCheckpoint()
-                # collisions tiles
-            elif sprite.rect.colliderect(player.rect) and sprite.ladder:
+
+        for sprite in self.spikes.sprites():
+            if sprite.rect.colliderect(player.rect) and sprite.deadly:
+                self.player.sprite.die()
+
+        for sprite in self.ladders.sprites():
+            if sprite.rect.colliderect(player.rect) and sprite.ladder:
                 player.collideOnLadder = sprite.rect.colliderect(player.rect) and sprite.ladder
                 inLadder = True
 
@@ -106,22 +117,22 @@ class Level:
         # gestion des collisions horizontales
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
-        for sprite in self.tiles.sprites():
-            if sprite.rect.colliderect(player.rect) and not (
-                    sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
-                # collisions gauche
-                if player.direction.x < 0:
-                    player.rect.left = sprite.rect.right
-                    self.currentX = player.rect.centerx
-                    player.collideOnLeft = True
-                # collisions droite
-                elif player.direction.x > 0:
-                    player.rect.right = sprite.rect.left
-                    self.currentX = player.rect.centerx
-                    player.collideOnRight = True
+        for groupTile in self.collidTiles:
+            for sprite in groupTile.sprites():
+                if sprite.rect.colliderect(player.rect) and not (sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
+                    # collisions gauche
+                    if player.direction.x < 0:
+                        player.rect.left = sprite.rect.right
+                        self.currentX = player.rect.centerx
+                        player.collideOnLeft = True
+                    # collisions droite
+                    elif player.direction.x > 0:
+                        player.rect.right = sprite.rect.left
+                        self.currentX = player.rect.centerx
+                        player.collideOnRight = True
         # si le joueur bouge sur l'axe x , on considère qu'il n'est plus en collision avec le mur
         # print(f"Left: {player.collideOnLeft} - Right: {player.collideOnRight}")
-        if player.rect.centerx < self.currentX or player.rect.centerx > self.currentX:
+        if player.rect.centerx != self.currentX:
             player.collideOnLeft = False
             player.collideOnRight = False
 
@@ -131,8 +142,7 @@ class Level:
         player.applyGravity()
         for sprite in self.tiles.sprites():
             # collisions tiles
-            if sprite.rect.colliderect(player.rect) and not (
-                    sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
+            if sprite.rect.colliderect(player.rect) and not (sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
                 # sol
                 if player.direction.y > 0:
                     player.rect.bottom = sprite.rect.top
@@ -164,10 +174,16 @@ class Level:
                 elif tile.rect.colliderect(npc.rect) and npc.direction.x > 0:
                     npc.rect.right = tile.rect.left
                     npc.direction.x = -1
+            for npc2 in self.npcs.sprites():
+                if npc2.rect.colliderect(npc.rect) and npc.direction.x < 0 and npc != npc2:
+                    npc.rect.left = tile.rect.right
+                    npc.direction.x = 1
+                elif npc2.rect.colliderect(npc.rect) and npc.direction.x > 0 and npc != npc2:
+                    npc.rect.right = tile.rect.left
+                    npc.direction.x = -1
 
             if npc.rect.colliderect(player.rect):
-                self.setupLevel()
-                self.loose = True
+                self.player.sprite.die()
 
     def npcVerticalMovementCollision(self):
         player = self.player.sprite
@@ -178,8 +194,7 @@ class Level:
                     npc.rect.bottom = tile.rect.top
                     npc.direction.y = 0
             if npc.rect.colliderect(player.rect):
-                self.setupLevel()
-                self.loose = True
+                 self.player.sprite.die()
 
     def gravitileVerticalMovementCollision(self):
         for gravitile in self.gravitiles.sprites():
@@ -190,11 +205,13 @@ class Level:
                     gravitile.direction.y = 0
                     gravitile.onGround = True
 
+
     def antiGravite(self):
         for gravitile in self.gravitiles.sprites():
             if gravitile.onGround:
                 gravitile.direction.y = gravitile.jumpSpeed
                 gravitile.onGround = False
+
 
     def scrollX(self):
         player = self.player.sprite
@@ -202,14 +219,14 @@ class Level:
         directionX = player.direction.x
 
         if playerX < screenWidth / 4 and directionX < 0:
-            self.worldShift.x = tileSize / 8
+            self.worldShift.x = playerSpeed
             player.speed = 0
         elif playerX > screenWidth - (screenWidth / 4) and directionX > 0:
-            self.worldShift.x = -tileSize / 8
+            self.worldShift.x = -playerSpeed
             player.speed = 0
         else:
             self.worldShift.x = 0
-            player.speed = tileSize / 8
+            player.speed = playerSpeed
 
     def cameraFollowPlayer(self):
         player = self.player.sprite
@@ -231,6 +248,7 @@ class Level:
         self.npcs.update(self.worldShift)
         self.player.update(self.worldShift)
 
+
         self.tiles.draw(self.displaySurface)
         self.player.draw(self.displaySurface)
         self.npcs.draw(self.displaySurface)
@@ -242,7 +260,7 @@ class Level:
         self.horizontalMovementCollision()
         self.verticalMovementCollision()
         self.blocCollision()
-
+                                                                                
         # npcs
         self.npcHorizontalMovementCollision()
         self.npcVerticalMovementCollision()
