@@ -32,7 +32,7 @@ class Level:
         self.player = pygame.sprite.GroupSingle()
         self.endsprite = pygame.sprite.GroupSingle()
         self.npcs = pygame.sprite.Group()
-        self.collidTiles = [self.tiles]
+        self.collidTiles = [self.tiles, self.gravitiles]
         self.player.lastCheckpoint = None
 
         file = open(self.csv, "r")
@@ -119,8 +119,13 @@ class Level:
     # gestion des collisions horizontales et verticales
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
-        # collision horizontale
-        for sprite in self.tiles.sprites():
+        listeSprites = []
+        for groupe in self.collidTiles:
+            for sprite in groupe.sprites():
+                listeSprites.append(sprite)
+
+    # collision horizontale
+        for sprite in listeSprites:
             if sprite.rect.colliderect(player.rect):
                 if player.direction.x < 0:
                     player.rect.left = sprite.rect.right
@@ -134,7 +139,7 @@ class Level:
                     break
         # collision verticale
         player.applyGravity()
-        for sprite in self.tiles.sprites():
+        for sprite in listeSprites:
             if sprite.rect.colliderect(player.rect):
                 if player.direction.y > 0:
                     player.rect.bottom = sprite.rect.top
