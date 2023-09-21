@@ -16,29 +16,48 @@ class Level:
     def __init__(self, surface, csv):
         self.csv = csv
         self.displaySurface = surface
-        self.setupLevel()
         self.worldShift = pygame.math.Vector2(0, 0)
-        self.cameraShift = pygame.math.Vector2(0, 0)
         self.currentX = 0
         self.finish = False
         self.loose = False
+        self.setupLevel()
 
     def setupLevel(self):
+        self.cameraObjects = []
+        # Solid blocs
         self.tiles = pygame.sprite.Group()
+        self.cameraObjects.append(self.tiles)
+        # Anti bravity blocks
         self.gravitiles = pygame.sprite.Group()
+        self.cameraObjects.append(self.gravitiles)
+        # Spikes
         self.spikes = pygame.sprite.Group()
+        self.cameraObjects.append(self.spikes)
+        # Power Ups
         self.powerups = pygame.sprite.Group()
+        self.cameraObjects.append(self.powerups)
+        # Checkpoints
         self.checkpoints = pygame.sprite.Group()
+        self.cameraObjects.append(self.checkpoints)
+        # Ladders
         self.ladders = pygame.sprite.Group()
-        self.player = pygame.sprite.GroupSingle()
-        self.endsprite = pygame.sprite.GroupSingle()
+        self.cameraObjects.append(self.ladders)
+        # Npcs
         self.npcs = pygame.sprite.Group()
+        self.cameraObjects.append(self.npcs)
+        # End
+        self.endsprite = pygame.sprite.GroupSingle()
+        self.cameraObjects.append(self.endsprite)
+        # Player
+        self.player = pygame.sprite.GroupSingle()
+        
         self.collidTiles = [self.tiles]
         self.player.lastCheckpoint = None
 
         file = open(self.csv, "r")
         rows = file.read().split("\n")
-        rows.pop()  # Supprimer la dernière ligne vide
+        if not rows[len(rows)-1]:
+            rows.pop()  # Supprimer la dernière ligne vide
 
         for rowIndex, row in enumerate(rows):
             row = row.split(",")
@@ -47,7 +66,7 @@ class Level:
                 x = colIndex
                 y = rowIndex
                 if cell == 1:  # tile -> bloc de mur/sol
-                    if int(rows[rowIndex - 1].split(",")[colIndex]) == 1:
+                    if rowIndex > 0 and int(rows[rowIndex - 1].split(",")[colIndex]) == 1:
                         tile = Tile((x * tileSize, y * tileSize), tileSize, True)
                     else:
                         tile = Tile((x * tileSize, y * tileSize), tileSize, False)
@@ -76,8 +95,9 @@ class Level:
                 elif cell == 9:     # bloc anti gravité
                     gravitile = Gravitile((x * tileSize, y * tileSize), tileSize)
                     self.gravitiles.add(gravitile)
-        self.collidTiles[0] = self.tiles
-        self.collidTiles[1] = self.spikes
+        self.collidTiles.clear()
+        self.collidTiles.append(self.tiles)
+        self.collidTiles.append(self.spikes)
         self.resetCamera()
 
 
@@ -122,7 +142,7 @@ class Level:
                     self.currentX = player.rect.centerx
                     player.collideOnLeft = True
                     break
-                elif player.direction.x > 0:
+                if player.direction.x > 0:
                     player.rect.right = sprite.rect.left
                     self.currentX = player.rect.centerx
                     player.collideOnRight = True
@@ -138,7 +158,7 @@ class Level:
                     player.canJump = True
                     player.lastJumpX = None
                     break
-                elif player.direction.y < 0:
+                if player.direction.y < 0:
                     player.rect.top = sprite.rect.bottom
                     player.direction.y = 0
                     break
@@ -241,26 +261,24 @@ class Level:
                     gravitile.direction.y = 0
                     gravitile.onGround = True
 
-
     def antiGravite(self):
         for gravitile in self.gravitiles.sprites():
             if gravitile.onGround:
                 gravitile.direction.y = gravitile.jumpSpeed
                 gravitile.onGround = False
 
-
-    def camera(self):
+    def cameraBehavior(self):
         player = self.player.sprite
         pos = pygame.math.Vector2(player.rect.centerx, player.rect.centery)
-        dir = player.direction
+        direction = player.direction
         maxDY = screenHeight / 4
         dy = screenHeight / 2 - pos.y
 
         # x axis behavior
-        if pos.x < screenWidth / 4 and dir.x < 0:
+        if pos.x < screenWidth / 4 and direction.x < 0:
             self.worldShift.x = playerSpeed
             player.speed = 0
-        elif pos.x > 3 * screenWidth / 4 and dir.x > 0:
+        elif pos.x > 3 * screenWidth / 4 and direction.x > 0:
             self.worldShift.x = -playerSpeed
             player.speed = 0
         else:
@@ -273,17 +291,30 @@ class Level:
         else:
             self.worldShift.y = 0
 
-
     def resetCamera(self):
         player = self.player.sprite
-        pos = pygame.math.Vector2(player.rect.centerx, player.rect.centery)
-        delt = pygame.math.Vector2(screenWidth / 2 - pos.x, screenHeight / 2 - pos.y)
-        print(delt)
-        self.worldShift = delt
+        player_center = pygame.math.Vector2(player.rect.centerx, player.rect.centery)
+
+        # Calculate the delta between the player's position and the center of the screen
+        delta = pygame.math.Vector2(screenWidth / 2 - player_center.x, screenHeight / 2 - player_center.y)
+
+        # Update the player's x position based on delta
+        player.rect.centerx += delta.x
+
+        # Update the positions of other cameraObjects
+        for group in self.cameraObjects:
+            for sprite in group.sprites():
+                sprite.rect.centerx += delta.x  # Update x position
+                # sprite.rect.top += delta.y  # Update y position
+
+        # Print debug information (optional)
+        print(f"Player x: {player_center.x}, y: {player_center.y}")
+        print(f"Delta x: {delta.x}, y: {delta.y}")
 
 
     def run(self):
         # updates
+        self.player.update(self.worldShift)
         self.tiles.update(self.worldShift)
         self.gravitiles.update(self.worldShift)
         self.spikes.update(self.worldShift)
@@ -292,7 +323,6 @@ class Level:
         self.ladders.update(self.worldShift)
         self.endsprite.update(self.worldShift)
         self.npcs.update(self.worldShift)
-        self.player.update(self.worldShift)
 
         # draw
         self.tiles.draw(self.displaySurface)
@@ -309,8 +339,6 @@ class Level:
         self.gravitileVerticalMovementCollision()
 
         # player
-        # self.horizontalMovementCollision()
-        # self.verticalMovementCollision()
         self.movementCollision()
         self.blocCollision()
                                                                                 
@@ -319,4 +347,4 @@ class Level:
         self.npcVerticalMovementCollision()
 
         # camera
-        self.camera()
+        self.cameraBehavior()

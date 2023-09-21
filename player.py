@@ -127,18 +127,20 @@ class Player(pygame.sprite.Sprite):
 
     def respawnLastCheckpoint(self):
         rect = self.lastCheckpoint.rect
-        pos = pygame.math.Vector2(rect.centerx, rect.bottom)
+        print(f"Last checkpoint x: {rect.centerx}, y: {rect.centery}")
+        pos = pygame.math.Vector2(rect.centerx, rect.centery)
         self.rect.centerx = pos.x
-        self.rect.bottom = pos.y
-        self.level.centerCamera()
+        self.rect.centery = pos.y
+        self.level.resetCamera()
 
-    def update(self, shift):
+    def update(self, worldShift):
         self.getInput()
         self.getStatus()
         self.animate()
-        self.rect.y += shift.y
+        self.rect.y += worldShift.y
 
     def die(self):
+        print(f"Death x: {self.rect.centerx}, y: {self.rect.centery}")
         if self.lastCheckpoint is None:
             self.level.setupLevel()
             self.level.loose = True
