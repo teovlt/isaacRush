@@ -36,13 +36,14 @@ pygame.mixer.music.set_volume(.1)
 # Fonction pour démarrer le jeu
 def startGame():
     level.setupLevel()
+    timer.start()
     run()
 
 
 # cycle du jeu
 def run():
     running = True
-    timer.start()
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -74,7 +75,7 @@ def run():
         # screen.blit(bgC,(0, 0))
         # screen.blit(bgD,(0, 0))
         level.run()
-        #Affichage du temps
+        # Affichage du temps
         current = timer.drawCurrent(elapsed_time)
         best = timer.drawBest()
         screen.blit(current, (10, 10))
@@ -117,14 +118,6 @@ def pause():
 def unpause():
     # Efface le menu pause
     screen.fill('black')
-
-    # Reprend le jeu
-    run()
-
-
-def resume():
-    unpause()
-
 
 def quitGame():
     mainMenu()
