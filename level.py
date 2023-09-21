@@ -17,7 +17,7 @@ class Level:
         self.csv = csv
         self.displaySurface = surface
         self.setupLevel()
-        self.worldShift = pygame.math.Vector2(0,0)
+        self.worldShift = pygame.math.Vector2(0, 0)
         self.currentX = 0
         self.finish = False
         self.loose = False
@@ -39,34 +39,39 @@ class Level:
                 cell = int(cell)
                 x = colIndex
                 y = rowIndex
-                if cell == 1:       # tile -> bloc de mur/sol
-                    tile = Tile((x * tileSize, y * tileSize), tileSize)
+                if cell == 1:  # tile -> bloc de mur/sol
+                    if int(rows[rowIndex - 1].split(",")[colIndex]) == 1:
+                        tile = Tile((x * tileSize, y * tileSize), tileSize, True)
+                    else:
+                        tile = Tile((x * tileSize, y * tileSize), tileSize, False)
                     self.tiles.add(tile)
-                elif cell == 2:     # Joueur
+                elif cell == 2:  # Joueur
                     player_sprite = Player((x * tileSize, y * tileSize), self)
                     self.player.add(player_sprite)
-                elif cell == 3:     # spike -> pic
+                elif cell == 3:  # spike -> pic
                     spike = Spike((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(spike)
-                elif cell == 4:     # npc -> ennemi
+                elif cell == 4:  # npc -> ennemi
                     npc = Npc((x * tileSize, y * tileSize + tileSize / 2))
                     self.npcs.add(npc)
-                elif cell == 5:     # fin
+                elif cell == 5:  # fin
                     end = End((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(end)
-                elif cell == 6:     # powerup
+                elif cell == 6:  # powerup
                     powerup = Powerup((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(powerup)
-                elif cell == 7:     # checkpoint
+                elif cell == 7:  # checkpoint
                     checkpoint = Checkpoint((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(checkpoint)
-                elif cell == 8:     # échelle
+                elif cell == 8:  # échelle
                     ladder = Ladder((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(ladder)
-                elif cell == 9:     # bloc anti gravité
+                elif cell == 9:  # bloc anti gravité
                     gravitile = Gravitile((x * tileSize, y * tileSize), tileSize)
                     self.gravitiles.add(gravitile)
                     self.tiles.add(gravitile)
+
+
 
     def blocCollision(self):
         inLadder = False
@@ -102,7 +107,8 @@ class Level:
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
         for sprite in self.tiles.sprites():
-            if sprite.rect.colliderect(player.rect) and not (sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
+            if sprite.rect.colliderect(player.rect) and not (
+                    sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
                 # collisions gauche
                 if player.direction.x < 0:
                     player.rect.left = sprite.rect.right
@@ -125,7 +131,8 @@ class Level:
         player.applyGravity()
         for sprite in self.tiles.sprites():
             # collisions tiles
-            if sprite.rect.colliderect(player.rect) and not (sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
+            if sprite.rect.colliderect(player.rect) and not (
+                    sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
                 # sol
                 if player.direction.y > 0:
                     player.rect.bottom = sprite.rect.top
@@ -171,8 +178,8 @@ class Level:
                     npc.rect.bottom = tile.rect.top
                     npc.direction.y = 0
             if npc.rect.colliderect(player.rect):
-                 self.setupLevel()
-                 self.loose = True
+                self.setupLevel()
+                self.loose = True
 
     def gravitileVerticalMovementCollision(self):
         for gravitile in self.gravitiles.sprites():
@@ -183,13 +190,11 @@ class Level:
                     gravitile.direction.y = 0
                     gravitile.onGround = True
 
-
     def antiGravite(self):
         for gravitile in self.gravitiles.sprites():
             if gravitile.onGround:
                 gravitile.direction.y = gravitile.jumpSpeed
                 gravitile.onGround = False
-
 
     def scrollX(self):
         player = self.player.sprite
@@ -197,14 +202,14 @@ class Level:
         directionX = player.direction.x
 
         if playerX < screenWidth / 4 and directionX < 0:
-            self.worldShift.x = tileSize/8
+            self.worldShift.x = tileSize / 8
             player.speed = 0
         elif playerX > screenWidth - (screenWidth / 4) and directionX > 0:
-            self.worldShift.x = -tileSize/8
+            self.worldShift.x = -tileSize / 8
             player.speed = 0
         else:
             self.worldShift.x = 0
-            player.speed = tileSize/8
+            player.speed = tileSize / 8
 
     def cameraFollowPlayer(self):
         player = self.player.sprite
@@ -226,7 +231,6 @@ class Level:
         self.npcs.update(self.worldShift)
         self.player.update(self.worldShift)
 
-
         self.tiles.draw(self.displaySurface)
         self.player.draw(self.displaySurface)
         self.npcs.draw(self.displaySurface)
@@ -238,7 +242,7 @@ class Level:
         self.horizontalMovementCollision()
         self.verticalMovementCollision()
         self.blocCollision()
-                                                                                
+
         # npcs
         self.npcHorizontalMovementCollision()
         self.npcVerticalMovementCollision()
