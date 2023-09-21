@@ -32,7 +32,7 @@ class Level:
         self.player = pygame.sprite.GroupSingle()
         self.endsprite = pygame.sprite.GroupSingle()
         self.npcs = pygame.sprite.Group()
-        self.collidTiles = [self.tiles, self.spikes]
+        self.collidTiles = [self.tiles]
         self.player.lastCheckpoint = None
 
         file = open(self.csv, "r")
@@ -56,40 +56,34 @@ class Level:
                     self.player.add(player_sprite)
                 elif cell == 3:     # spike -> pic
                     spike = Spike((x * tileSize, y * tileSize), tileSize)
-                    self.tiles.add(spike)
                     self.spikes.add(spike)
                 elif cell == 4:     # npc -> ennemi
                     npc = Npc((x * tileSize, y * tileSize + tileSize / 2))
                     self.npcs.add(npc)
                 elif cell == 5:     # fin
                     end = End((x * tileSize, y * tileSize), tileSize)
-                    self.tiles.add(end)
                     self.endsprite.add(end)
                 elif cell == 6:     # powerup
                     powerup = Powerup((x * tileSize, y * tileSize), tileSize)
-                    self.tiles.add(powerup)
                     self.powerups.add(powerup)
                 elif cell == 7:     # checkpoint
                     checkpoint = Checkpoint((x * tileSize, y * tileSize), tileSize)
-                    self.tiles.add(checkpoint)
                     self.checkpoints.add(checkpoint)
                 elif cell == 8:     # échelle
                     ladder = Ladder((x * tileSize, y * tileSize), tileSize)
-                    self.tiles.add(ladder)
                     self.ladders.add(ladder)
                 elif cell == 9:     # bloc anti gravité
                     gravitile = Gravitile((x * tileSize, y * tileSize), tileSize)
                     self.gravitiles.add(gravitile)
-                    self.tiles.add(gravitile)
         self.collidTiles[0] = self.tiles
-        self.collidTiles[1] = self.spikes
+        #self.collidTiles[1] = self.spikes
 
 
     def blocCollision(self):
         inLadder = False
         player = self.player.sprite
 
-        if player.rect.colliderect(self.endsprite.sprite.rect):
+        if self.endsprite.sprite.rect.colliderect(player.rect) and self.endsprite.sprite.end:
             self.setupLevel()
             self.finish = True
 
@@ -113,6 +107,53 @@ class Level:
         if not inLadder:
             player.collideOnLadder = False
 
+
+    def movementCollision(self):
+    # gestion des collisions horizontales et verticales
+        player = self.player.sprite
+        player.rect.x += player.direction.x * player.speed
+        # collision horizontale
+        for sprite in self.tiles.sprites():
+            if sprite.rect.colliderect(player.rect):
+                if player.direction.x < 0:
+                    player.rect.left = sprite.rect.right
+                    self.currentX = player.rect.centerx
+                    player.collideOnLeft = True
+                    break
+                elif player.direction.x > 0:
+                    player.rect.right = sprite.rect.left
+                    self.currentX = player.rect.centerx
+                    player.collideOnRight = True
+                    break
+        # collision verticale
+        player.applyGravity()
+        for sprite in self.tiles.sprites():
+            if sprite.rect.colliderect(player.rect):
+                if player.direction.y > 0:
+                    player.rect.bottom = sprite.rect.top
+                    player.direction.y = 0
+                    player.onGround = True
+                    player.canJump = True
+                    break
+                elif player.direction.y < 0:
+                    player.rect.top = sprite.rect.bottom
+                    player.direction.y = 0
+                    break
+        # si le joueur bouge sur l'axe x , on considère qu'il n'est plus en collision avec le mur
+        if player.rect.centerx < self.currentX or player.rect.centerx > self.currentX:
+            player.collideOnLeft = False
+            player.collideOnRight = False
+
+        if player.onGround and player.direction.y < 0 or player.direction.y > 1:
+            player.onGround = False
+
+        for npc in self.npcs.sprites():
+            if npc.rect.colliderect(player.rect) and player.direction.y > 0:
+                player.rect.bottom = npc.rect.top
+                player.direction.y = player.jumpSpeed / 2
+                npc.kill()
+
+
     def horizontalMovementCollision(self):
         # gestion des collisions horizontales
         player = self.player.sprite
@@ -120,6 +161,7 @@ class Level:
         for groupTile in self.collidTiles:
             for sprite in groupTile.sprites():
                 if sprite.rect.colliderect(player.rect) and not (sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
+
                     # collisions gauche
                     if player.direction.x < 0:
                         player.rect.left = sprite.rect.right
@@ -131,8 +173,7 @@ class Level:
                         self.currentX = player.rect.centerx
                         player.collideOnRight = True
         # si le joueur bouge sur l'axe x , on considère qu'il n'est plus en collision avec le mur
-        # print(f"Left: {player.collideOnLeft} - Right: {player.collideOnRight}")
-        if player.rect.centerx != self.currentX:
+        if player.rect.centerx < self.currentX or player.rect.centerx > self.currentX:
             player.collideOnLeft = False
             player.collideOnRight = False
 
@@ -154,10 +195,8 @@ class Level:
                 elif player.direction.y < 0:
                     player.rect.top = sprite.rect.bottom
                     player.direction.y = 0
-
         if player.onGround and player.direction.y < 0 or player.direction.y > 1:
             player.onGround = False
-
         for npc in self.npcs.sprites():
             if npc.rect.colliderect(player.rect) and player.direction.y > 0:
                 player.rect.bottom = npc.rect.top
@@ -246,11 +285,23 @@ class Level:
     def run(self):
         # updates
         self.tiles.update(self.worldShift)
+        self.gravitiles.update(self.worldShift)
+        self.spikes.update(self.worldShift)
+        self.checkpoints.update(self.worldShift)
+        self.powerups.update(self.worldShift)
+        self.ladders.update(self.worldShift)
+        self.endsprite.update(self.worldShift)
         self.npcs.update(self.worldShift)
         self.player.update(self.worldShift)
 
-
+        # draw
         self.tiles.draw(self.displaySurface)
+        self.gravitiles.draw(self.displaySurface)
+        self.spikes.draw(self.displaySurface)
+        self.checkpoints.draw(self.displaySurface)
+        self.powerups.draw(self.displaySurface)
+        self.ladders.draw(self.displaySurface)
+        self.endsprite.draw(self.displaySurface)
         self.player.draw(self.displaySurface)
         self.npcs.draw(self.displaySurface)
 
@@ -258,8 +309,9 @@ class Level:
         self.gravitileVerticalMovementCollision()
 
         # player
-        self.horizontalMovementCollision()
-        self.verticalMovementCollision()
+        # self.horizontalMovementCollision()
+        # self.verticalMovementCollision()
+        self.movementCollision()
         self.blocCollision()
                                                                                 
         # npcs
