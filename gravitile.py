@@ -10,8 +10,9 @@ class Gravitile(tile.Tile):
         self.agravite = True
         self.antiGravity = True
         self.direction = pg.Vector2(0, 0)
-        self.gravity = tileSize / 80
+        self.gravity = 0.1
         self.jumpSpeed = -tileSize / 4
+        self.onGround = False
 
     def applyGravity(self):
         if self.agravite:
@@ -21,9 +22,3 @@ class Gravitile(tile.Tile):
     def update(self, shift):
         self.rect.x += shift.x
         self.rect.y += shift.y
-
-
-
-
-
-

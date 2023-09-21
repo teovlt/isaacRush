@@ -27,7 +27,8 @@ class Player(pygame.sprite.Sprite):
         self.canJumpOnRight = False
         self.collideOnLeft= False
         self.collideOnRight= False
-        self.collisionLadder = False
+        self.collideOnLadder = False
+        self.collideOnAntiGravity = False
         self.lastCheckpoint = None
 
     def getInput(self):
@@ -53,7 +54,7 @@ class Player(pygame.sprite.Sprite):
             self.ladderClimb()
 
         if keys[pygame.K_e]:
-            self.level.antigravite()
+            self.level.antiGravite()
 
     def applyGravity(self):
         self.direction.y += self.gravity
@@ -77,7 +78,7 @@ class Player(pygame.sprite.Sprite):
             self.canJumpOnLeft = True
 
     def ladderClimb(self):
-        if self.collisionLadder:
+        if self.collideOnLadder:
             self.direction.y = self.jumpSpeed
 
     def respawnLastCheckpoint(self):

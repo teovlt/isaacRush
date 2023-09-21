@@ -51,19 +51,19 @@ class Level:
                 elif cell == 4:     # npc -> ennemi
                     npc = Npc((x * tileSize, y * tileSize + tileSize / 2))
                     self.npcs.add(npc)
-                elif cell == 5:
+                elif cell == 5:     # fin
                     end = End((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(end)
-                elif cell == 6:
+                elif cell == 6:     # powerup
                     powerup = Powerup((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(powerup)
-                elif cell == 7:
+                elif cell == 7:     # checkpoint
                     checkpoint = Checkpoint((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(checkpoint)
-                elif cell == 8:
+                elif cell == 8:     # échelle
                     ladder = Ladder((x * tileSize, y * tileSize), tileSize)
                     self.tiles.add(ladder)
-                elif cell == 9:
+                elif cell == 9:     # bloc anti gravité
                     gravitile = Gravitile((x * tileSize, y * tileSize), tileSize)
                     self.gravitiles.add(gravitile)
                     self.tiles.add(gravitile)
@@ -91,11 +91,11 @@ class Level:
                     self.player.sprite.respawnLastCheckpoint()
                 # collisions tiles
             elif sprite.rect.colliderect(player.rect) and sprite.ladder:
-                player.collisionLadder = sprite.rect.colliderect(player.rect) and sprite.ladder
+                player.collideOnLadder = sprite.rect.colliderect(player.rect) and sprite.ladder
                 inLadder = True
 
         if not inLadder:
-            player.collisionLadder = False
+            player.collideOnLadder = False
 
     def horizontalMovementCollision(self):
         # gestion des collisions horizontales
@@ -145,15 +145,6 @@ class Level:
                 player.rect.bottom = npc.rect.top
                 player.direction.y = player.jumpSpeed / 2
                 npc.kill()
-                self.loose = True
-
-    def gravitileVerticalMovementCollision(self):
-        for gravitile in self.gravitiles.sprites():
-            gravitile.applyGravity()
-            for tile in self.tiles.sprites():
-                if gravitile.rect.colliderect(tile.rect) and not tile.antiGravity:
-                    gravitile.rect.bottom = tile.rect.top
-                    gravitile.direction.y = 0
 
     def npcHorizontalMovementCollision(self):
         player = self.player.sprite
@@ -183,9 +174,21 @@ class Level:
                  self.setupLevel()
                  self.loose = True
 
-    def antigravite(self):
-        for tile in self.gravitiles.sprites():
-            tile.update(pygame.math.Vector2(0, -tileSize/3))
+    def gravitileVerticalMovementCollision(self):
+        for gravitile in self.gravitiles.sprites():
+            gravitile.applyGravity()
+            for tile in self.tiles.sprites():
+                if tile.rect.colliderect(gravitile.rect) and not tile.antiGravity:
+                    gravitile.rect.bottom = tile.rect.top
+                    gravitile.direction.y = 0
+                    gravitile.onGround = True
+
+
+    def antiGravite(self):
+        for gravitile in self.gravitiles.sprites():
+            if gravitile.onGround:
+                gravitile.direction.y = gravitile.jumpSpeed
+                gravitile.onGround = False
 
 
     def scrollX(self):
@@ -203,7 +206,6 @@ class Level:
             self.worldShift.x = 0
             player.speed = tileSize/8
 
-
     def cameraFollowPlayer(self):
         player = self.player.sprite
         playerY = player.rect.centery
@@ -218,7 +220,6 @@ class Level:
         else:
             self.worldShift.y = 0
 
-
     def run(self):
         # updates
         self.tiles.update(self.worldShift)
@@ -230,6 +231,8 @@ class Level:
         self.player.draw(self.displaySurface)
         self.npcs.draw(self.displaySurface)
 
+        # gravitiles
+        self.gravitileVerticalMovementCollision()
 
         # player
         self.horizontalMovementCollision()
@@ -239,9 +242,6 @@ class Level:
         # npcs
         self.npcHorizontalMovementCollision()
         self.npcVerticalMovementCollision()
-
-        # gravitiles
-        self.gravitileVerticalMovementCollision()
 
         # camera
         self.scrollX()
