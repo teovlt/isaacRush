@@ -1,6 +1,6 @@
 # level.py
 import pygame
-from settings import tileSize, screenWidth, screenHeight
+from settings import *
 from checkpoint import Checkpoint
 from powerup import Powerup
 from tile import Tile
@@ -197,14 +197,14 @@ class Level:
         directionX = player.direction.x
 
         if playerX < screenWidth / 4 and directionX < 0:
-            self.worldShift.x = tileSize/8
+            self.worldShift.x = playerSpeed
             player.speed = 0
         elif playerX > screenWidth - (screenWidth / 4) and directionX > 0:
-            self.worldShift.x = -tileSize/8
+            self.worldShift.x = -playerSpeed
             player.speed = 0
         else:
             self.worldShift.x = 0
-            player.speed = tileSize/8
+            player.speed = playerSpeed
 
     def cameraFollowPlayer(self):
         player = self.player.sprite

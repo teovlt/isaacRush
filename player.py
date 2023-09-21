@@ -1,6 +1,6 @@
 # player.py
 import pygame
-from settings import tileSize
+from settings import tileSize, playerSpeed
 from timer import Timer
 
 timer = Timer()
@@ -15,7 +15,7 @@ class Player(pygame.sprite.Sprite):
 
         # déplacements
         self.direction = pygame.Vector2(0, 0)
-        self.speed = tileSize/8
+        self.speed = playerSpeed
         self.gravity = tileSize/80
         self.jumpSpeed = -tileSize/3.3
         self.spacePressed = False
