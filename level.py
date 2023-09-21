@@ -236,9 +236,15 @@ class Level:
                 if tile.rect.colliderect(npc.rect) and npc.direction.x < 0:
                     npc.rect.left = tile.rect.right
                     npc.direction.x = 1
+                    image = pygame.image.load("Graphics/Npcs/rightNpc.png")
+                    imageF = pygame.transform.scale(image, (tileSize, tileSize))
+                    npc.image = imageF
                 elif tile.rect.colliderect(npc.rect) and npc.direction.x > 0:
                     npc.rect.right = tile.rect.left
                     npc.direction.x = -1
+                    image = pygame.image.load("Graphics/Npcs/leftNpc.png")
+                    imageF = pygame.transform.scale(image, (tileSize, tileSize))
+                    npc.image = imageF
 
             if npc.rect.colliderect(player.rect):
                 self.player.sprite.die()
