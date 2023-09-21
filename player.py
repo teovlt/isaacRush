@@ -90,3 +90,11 @@ class Player(pygame.sprite.Sprite):
     def update(self, shift):
         self.getInput()
         self.rect.y += shift.y
+
+
+    def die(self):
+        if self.lastCheckpoint is None:
+            self.level.setupLevel()
+            self.level.loose = True
+        else:
+            self.respawnLastCheckpoint()

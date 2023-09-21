@@ -82,13 +82,11 @@ class Level:
             # disable collisions checkpoint
             elif sprite.rect.colliderect(player.rect) and sprite.checkpoint:
                 self.player.sprite.lastCheckpoint = sprite
+                print("checkpoint")
+                print(self.player.sprite.lastCheckpoint.rect.x)
             # collisions spike
             elif sprite.rect.colliderect(player.rect) and sprite.deadly:
-                if self.player.sprite.lastCheckpoint is None:
-                    self.setupLevel()
-                    self.loose = True
-                else:
-                    self.player.sprite.respawnLastCheckpoint()
+                self.player.sprite.die()
                 # collisions tiles
             elif sprite.rect.colliderect(player.rect) and sprite.ladder:
                 player.collideOnLadder = sprite.rect.colliderect(player.rect) and sprite.ladder
@@ -159,8 +157,7 @@ class Level:
                     npc.direction.x = -1
 
             if npc.rect.colliderect(player.rect):
-                self.setupLevel()
-                self.loose = True
+                self.player.sprite.die()
 
     def npcVerticalMovementCollision(self):
         player = self.player.sprite
@@ -171,8 +168,7 @@ class Level:
                     npc.rect.bottom = tile.rect.top
                     npc.direction.y = 0
             if npc.rect.colliderect(player.rect):
-                 self.setupLevel()
-                 self.loose = True
+                 self.player.sprite.die()
 
     def gravitileVerticalMovementCollision(self):
         for gravitile in self.gravitiles.sprites():
