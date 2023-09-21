@@ -17,7 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.Vector2(0, 0)
         self.speed = tileSize/8
         self.gravity = tileSize/80
-        self.jumpSpeed = -tileSize/4
+        self.jumpSpeed = -tileSize/3.3
         self.spacePressed = False
 
         # état
