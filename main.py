@@ -96,8 +96,8 @@ def pause():
                             if button.action:
                                 button.action()
                                 paused = False
-        screen.fill('#ffffff')
-        displayText(screen, "Pause", 150, screenWidth // 2, 200, 'black')
+        screen.fill('black')
+        displayText(screen, "Pause", 150, screenWidth // 2, 200, 'white')
 
         # Afficher le menu pause
         menuPause.displayButtons(screen)
@@ -139,7 +139,7 @@ def mainMenu():
         screen.fill('black')
 
         # Afficher le titre du jeu dans le menu
-        displayText(screen, "Isaac Run", 150, screenWidth // 2, 150, 'white')
+        displayText(screen, "Isaac Rush", 150, screenWidth // 2, 150, 'white')
 
         # Afficher le menu
         menu.displayButtons(screen)
