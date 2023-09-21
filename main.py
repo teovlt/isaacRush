@@ -139,7 +139,7 @@ def mainMenu():
         screen.fill('black')
 
         # Afficher le titre du jeu dans le menu
-        displayText(screen, "Menu Mystère", 150, screenWidth // 2, 150, 'white')
+        displayText(screen, "Isaac Run", 150, screenWidth // 2, 150, 'white')
 
         # Afficher le menu
         menu.displayButtons(screen)
