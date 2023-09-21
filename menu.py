@@ -21,7 +21,7 @@ class Button:
 
     def displayButton(self, screen):
         pygame.draw.rect(screen, self.colorBackground, self.rect)
-        displayText(screen, self.text, 36, self.rect.centerx, self.rect.centery, self.colorText)
+        displayText(screen, self.text, 45, self.rect.centerx, self.rect.centery, self.colorText)
 
 # Fonction pour afficher du texte sur l'écran
 def displayText(screen, text, size, x, y, color):

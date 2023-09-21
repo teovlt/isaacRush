@@ -1,12 +1,9 @@
 # main.py
-import pygame
-import sys
+import pygame, sys, os, time, pandas
 from level import Level
 from menu import Menu, Button, displayText, displayNumber
 from settings import *
 from timer import Timer
-import time
-import pandas
 
 # Initialisation de Pygame
 pygame.init()
@@ -16,19 +13,12 @@ clock = pygame.time.Clock()
 timer = Timer()
 
 if not "-c" in sys.argv:
-    df = pandas.read_excel('map.ods')
+    df = pandas.read_excel('./map.ods')
     df.to_csv('map.csv', header=False, index=False)
 
 level = Level(screen, "./map.csv")
 pygame.display.set_caption("")
-# bg = pygame.image.load("Graphics/Backgrounds/RTB_v1.0/background.png")
-# bg2 = pygame.image.load("Graphics/Backgrounds/RTB_v1.0/background2.png")
-# bg3 = pygame.image.load("Graphics/Backgrounds/RTB_v1.0/background3.png")
-# bg4 = pygame.image.load("Graphics/Backgrounds/RTB_v1.0/background4.png")
-# bgA = pygame.transform.scale(bg, (1280, 720))
-# bgB = pygame.transform.scale(bg2, (1280, 720))
-# bgC = pygame.transform.scale(bg3, (1280, 720))
-# bgD = pygame.transform.scale(bg3, (1280, 720))
+
 # Music
 pygame.mixer.music.load("Audio/3.mp3")
 pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
@@ -42,8 +32,21 @@ def startGame():
     run()
 
 
+def loadBestScore():
+    if os.path.exists('bestTime.txt'):
+        with open('bestTime.txt', 'r') as file:
+            try:
+                bestScore = float(file.read())
+                return bestScore
+            except ValueError:
+                return float('40')  # Score par défaut si le fichier est corrompu
+    else:
+        return float('40')  # Score par défaut si le fichier n'existe pas
+
+
 # cycle du jeu
 def run():
+    global bestScore 
     running = True
 
     while running:
@@ -53,41 +56,42 @@ def run():
                 sys.exit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 pause()
-                timer.startTime = time.monotonic() - elapsed_time
+                timer.startTime = time.monotonic() - elapsedTime
             if event.type == pygame.KEYDOWN and event.key == pygame.K_c:
                 level.setupLevel()
                 level.loose = True
 
-        current_time = time.monotonic()
-        elapsed_time = current_time - timer.startTime
+        currentTime = time.monotonic()
+        elapsedTime = currentTime - timer.startTime
 
         # Verification timer
         if timer.bestTime is None or level.finish:
             timer.start()
-            timer.update_best_time(elapsed_time)
             level.finish = False
-            timer.update_best_time(elapsed_time)
+            # Vérifie si le meilleur score a été battu
+            if elapsedTime < bestScore:
+                bestScore = elapsedTime
+                # Sauvegarde le nouveau meilleur score dans le fichier
+                with open('bestTime.txt', 'w') as file:
+                    file.write(str(bestScore))
         elif level.loose:
             timer.start()
             level.loose = False
 
         screen.fill('black')
-        # screen.blit(bgA,(0, 0))
-        # screen.blit(bgB,(0, 0))
-        # screen.blit(bgC,(0, 0))
-        # screen.blit(bgD,(0, 0))
         level.run()
         # Affichage du temps
-        current = timer.drawCurrent(elapsed_time)
-        best = timer.drawBest()
+        current = timer.drawCurrent(elapsedTime)
+        best = timer.drawCurrent(bestScore)
         screen.blit(current, (10, 10))
         screen.blit(best, (10, 50))
 
         pygame.display.update()
         clock.tick(60)  # limiter à 60fps
 
-    return best
     pygame.quit()
+
+
 
 def pause():
     paused = True
@@ -118,8 +122,7 @@ def pause():
 
 # Fonction pour reprendre le jeu depuis la pause
 def unpause():
-    # Efface le menu pause
-    screen.fill('black')
+    pass
 
 def quitGame():
     mainMenu()
@@ -145,11 +148,11 @@ def mainMenu():
 
         # Effacer l'écran
         screen.fill('black')
-        
+
         # Afficher le titre du jeu dans le menu
         displayText(screen, "Isaac Rush", 150, screenWidth // 2, 150, 'white')
         displayText(screen, "Meilleur temps : ", 25, 120, screenHeight - 25, 'white')
-        displayNumber(screen, str(timer.bestTime),30,230, screenHeight - 22, 'white')
+        displayNumber(screen, str(round(bestScore, 1)),30,250, screenHeight - 22, 'white')
 
         # Afficher le menu
         menu.displayButtons(screen)
@@ -165,11 +168,15 @@ menu.addButton(buttonPlay)  #  Ajoute le bouton au menu
 buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 70, 300, 75, "Quitter", 'black', 'white', quit)
 menu.addButton(buttonQuit)  #  Ajoute le bouton au menu
 
+
+bestScore = loadBestScore()  # Charge le meilleur score au démarrage
+
+
 # Créer le menu pause et ses boutons
 menuPause = Menu()
-buttonResume = Button(screenWidth // 2 - 150, screenHeight // 2 - 50, 300, 75, "Reprendre", 'black', 'white', unpause)
+buttonResume = Button(screenWidth // 2 - 150, screenHeight // 2 - 50, 300, 75, "Reprendre", 'white', 'black', unpause)
 menuPause.addButton(buttonResume)  #  Ajoute le bouton au menu
-buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 50, 300, 75, "Quitter", 'black', 'white', quitGame)
+buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 50, 300, 75, "Quitter", 'white', 'black', quitGame)
 menuPause.addButton(buttonQuit)  #  Ajoute le bouton au menu
 
 # Démarrer le menu principal
