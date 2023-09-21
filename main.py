@@ -15,8 +15,10 @@ clock = pygame.time.Clock()
 
 timer = Timer()
 
-df = pandas.read_excel('map.ods')
-df.to_csv('map.csv', header=False, index=False)
+if not "-c" in sys.argv:
+    df = pandas.read_excel('map.ods')
+    df.to_csv('map.csv', header=False, index=False)
+
 level = Level(screen, "./map.csv")
 pygame.display.set_caption("")
 # bg = pygame.image.load("Graphics/Backgrounds/RTB_v1.0/background.png")
