@@ -20,6 +20,7 @@ class Player(pygame.sprite.Sprite):
 
         # état
         self.onGround = False
+        self.onGravitile = False
         self.canJump = False
         self.lastJumpX = None
         self.collideOnLeft= False
@@ -107,6 +108,11 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.direction.y
 
     def jump(self):
+        if self.canJump and self.onGravitile:
+            self.direction.y = self.jumpSpeed
+            self.canJump = False
+            self.canJumpOnLeft = True
+            self.canJumpOnRight = True
         if self.onGround and self.canJump:
             self.direction.y = self.jumpSpeed
             self.canJumpOnLeft = True
