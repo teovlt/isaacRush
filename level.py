@@ -18,6 +18,7 @@ class Level:
         self.displaySurface = surface
         self.setupLevel()
         self.worldShift = pygame.math.Vector2(0, 0)
+        self.cameraShift = pygame.math.Vector2(0, 0)
         self.currentX = 0
         self.finish = False
         self.loose = False
@@ -76,7 +77,8 @@ class Level:
                     gravitile = Gravitile((x * tileSize, y * tileSize), tileSize)
                     self.gravitiles.add(gravitile)
         self.collidTiles[0] = self.tiles
-        #self.collidTiles[1] = self.spikes
+        self.collidTiles[1] = self.spikes
+        self.resetCamera()
 
 
     def blocCollision(self):
@@ -174,7 +176,7 @@ class Level:
                         self.currentX = player.rect.centerx
                         player.collideOnRight = True
         # si le joueur bouge sur l'axe x , on considère qu'il n'est plus en collision avec le mur
-        if player.rect.centerx < self.currentX or player.rect.centerx > self.currentX:
+        if player.rect.centerx != self.currentX:
             player.collideOnLeft = False
             player.collideOnRight = False
 
@@ -215,13 +217,6 @@ class Level:
                 elif tile.rect.colliderect(npc.rect) and npc.direction.x > 0:
                     npc.rect.right = tile.rect.left
                     npc.direction.x = -1
-            for npc2 in self.npcs.sprites():
-                if npc2.rect.colliderect(npc.rect) and npc.direction.x < 0 and npc != npc2:
-                    npc.rect.left = tile.rect.right
-                    npc.direction.x = 1
-                elif npc2.rect.colliderect(npc.rect) and npc.direction.x > 0 and npc != npc2:
-                    npc.rect.right = tile.rect.left
-                    npc.direction.x = -1
 
             if npc.rect.colliderect(player.rect):
                 self.player.sprite.die()
@@ -254,42 +249,38 @@ class Level:
                 gravitile.onGround = False
 
 
-    def scrollX(self):
+    def camera(self):
         player = self.player.sprite
-        playerX = player.rect.centerx
-        directionX = player.direction.x
+        pos = pygame.math.Vector2(player.rect.centerx, player.rect.centery)
+        dir = player.direction
+        maxDY = screenHeight / 4
+        dy = screenHeight / 2 - pos.y
 
-        if playerX < screenWidth / 4 and directionX < 0:
+        # x axis behavior
+        if pos.x < screenWidth / 4 and dir.x < 0:
             self.worldShift.x = playerSpeed
             player.speed = 0
-        elif playerX > screenWidth - (screenWidth / 4) and directionX > 0:
+        elif pos.x > 3 * screenWidth / 4 and dir.x > 0:
             self.worldShift.x = -playerSpeed
             player.speed = 0
         else:
             self.worldShift.x = 0
             player.speed = playerSpeed
 
-    def cameraFollowPlayer(self):
-        player = self.player.sprite
-        playerY = player.rect.centery
-        screenCenter = screenHeight / 2
-        playerDelta = screenCenter - playerY
-
-        if abs(playerDelta) - 100 > 0:
-            if playerDelta > 0:
-                self.worldShift.y = playerDelta - 100
-            if playerDelta < 0:
-                self.worldShift.y = playerDelta + 100
+        # y axis behavior
+        if abs(dy) > maxDY:
+            self.worldShift.y = dy - maxDY if dy > 0 else dy + maxDY
         else:
             self.worldShift.y = 0
 
+
     def resetCamera(self):
         player = self.player.sprite
-        playerPos = pygame.math.Vector2(player.rect.centerx, player.rect.centery)
-        screen = pygame.math.Vector2(screenWidth / 2, screenHeight / 2)
-        delta = pygame.math.Vector2(screen.x - playerPos.x, screen.y - playerPos.y)
+        pos = pygame.math.Vector2(player.rect.centerx, player.rect.centery)
+        delt = pygame.math.Vector2(screenWidth / 2 - pos.x, screenHeight / 2 - pos.y)
+        print(delt)
+        self.worldShift = delt
 
-        self.worldShift = delta
 
     def run(self):
         # updates
@@ -328,5 +319,4 @@ class Level:
         self.npcVerticalMovementCollision()
 
         # camera
-        self.scrollX()
-        self.cameraFollowPlayer()
+        self.camera()

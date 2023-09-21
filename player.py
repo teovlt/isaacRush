@@ -126,8 +126,11 @@ class Player(pygame.sprite.Sprite):
             self.direction.y = self.jumpSpeed
 
     def respawnLastCheckpoint(self):
-        self.rect.x = self.lastCheckpoint.rect.x
-        self.rect.y = self.lastCheckpoint.rect.y
+        rect = self.lastCheckpoint.rect
+        pos = pygame.math.Vector2(rect.centerx, rect.bottom)
+        self.rect.centerx = pos.x
+        self.rect.bottom = pos.y
+        self.level.centerCamera()
 
     def update(self, shift):
         self.getInput()
@@ -141,4 +144,3 @@ class Player(pygame.sprite.Sprite):
             self.level.loose = True
         else:
             self.respawnLastCheckpoint()
-            self.level.resetCamera()
