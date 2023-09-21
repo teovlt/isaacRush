@@ -32,7 +32,7 @@ class Level:
         self.player = pygame.sprite.GroupSingle()
         self.endsprite = pygame.sprite.GroupSingle()
         self.npcs = pygame.sprite.Group()
-        self.collidTiles = [self.tiles, self.gravitiles]
+        self.collidTiles = [self.tiles]
         self.player.lastCheckpoint = None
 
         file = open(self.csv, "r")
@@ -117,7 +117,10 @@ class Level:
 
     def movementCollision(self):
     # gestion des collisions horizontales et verticales
+
         player = self.player.sprite
+
+        print(player.onGravitile)
         player.rect.x += player.direction.x * player.speed
         listeSprites = []
         for groupe in self.collidTiles:
@@ -127,78 +130,38 @@ class Level:
     # collision horizontale
         for sprite in listeSprites:
             if sprite.rect.colliderect(player.rect):
+                player.onGravitile = False
+                # collisions gauche
                 if player.direction.x < 0:
                     player.rect.left = sprite.rect.right
                     self.currentX = player.rect.centerx
                     player.collideOnLeft = True
                     break
+                # collisions droite
                 elif player.direction.x > 0:
                     player.rect.right = sprite.rect.left
                     self.currentX = player.rect.centerx
                     player.collideOnRight = True
                     break
+        for sprite in self.gravitiles.sprites():
+            if sprite.rect.colliderect(player.rect) and player.onGround:
+                if player.direction.x < 0:
+                    player.rect.left = sprite.rect.right
+                    self.currentX = player.rect.centerx
+                    player.collideOnLeft = True
+                    break
+                # collisions droite
+                if player.direction.x > 0:
+                    player.rect.right = sprite.rect.left
+                    self.currentX = player.rect.centerx
+                    player.collideOnRight = True
+                    break
+                # player.direction.y = sprite.direction.y -1
         # collision verticale
         player.applyGravity()
         for sprite in listeSprites:
             if sprite.rect.colliderect(player.rect):
-                if player.direction.y > 0:
-                    player.rect.bottom = sprite.rect.top
-                    player.direction.y = 0
-                    player.onGround = True
-                    player.canJump = True
-                    player.lastJumpX = None
-                    break
-                elif player.direction.y < 0:
-                    player.rect.top = sprite.rect.bottom
-                    player.direction.y = 0
-                    break
-        # si le joueur bouge sur l'axe x , on considère qu'il n'est plus en collision avec le mur
-        if player.rect.centerx < self.currentX or player.rect.centerx > self.currentX:
-            player.collideOnLeft = False
-            player.collideOnRight = False
-
-        if player.onGround and player.direction.y < 0 or player.direction.y > 1:
-            player.onGround = False
-
-        for npc in self.npcs.sprites():
-            if npc.rect.colliderect(player.rect) and player.direction.y > 0:
-                player.rect.bottom = npc.rect.top
-                player.direction.y = player.jumpSpeed / 2
-                npc.kill()
-
-
-    def horizontalMovementCollision(self):
-        # gestion des collisions horizontales
-        player = self.player.sprite
-        player.rect.x += player.direction.x * player.speed
-        for groupTile in self.collidTiles:
-            for sprite in groupTile.sprites():
-                if sprite.rect.colliderect(player.rect) and not (
-                        sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
-                    # collisions gauche
-                    if player.direction.x < 0:
-                        player.rect.left = sprite.rect.right
-                        self.currentX = player.rect.centerx
-                        player.collideOnLeft = True
-                    # collisions droite
-                    elif player.direction.x > 0:
-                        player.rect.right = sprite.rect.left
-                        self.currentX = player.rect.centerx
-                        player.collideOnRight = True
-        # si le joueur bouge sur l'axe x , on considère qu'il n'est plus en collision avec le mur
-        # print(f"Left: {player.collideOnLeft} - Right: {player.collideOnRight}")
-        if player.rect.centerx != self.currentX:
-            player.collideOnLeft = False
-            player.collideOnRight = False
-
-    def verticalMovementCollision(self):
-        # gestion des collisions verticales
-        player = self.player.sprite
-        player.applyGravity()
-        for sprite in self.tiles.sprites():
-            # collisions tiles
-            if sprite.rect.colliderect(player.rect) and not (
-                    sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
+                player.onGravitile = False
                 # sol
                 if player.direction.y > 0:
                     player.rect.bottom = sprite.rect.top
@@ -206,17 +169,45 @@ class Level:
                     player.onGround = True
                     player.canJump = True
                     player.lastJumpX = None
+                    break
                 # plafond
                 elif player.direction.y < 0:
                     player.rect.top = sprite.rect.bottom
                     player.direction.y = 0
+                    break
+        for sprite in self.gravitiles.sprites():
+            if sprite.rect.colliderect(player.rect):
+                if player.direction.y > 0:
+                    player.rect.bottom = sprite.rect.top
+                    player.direction.y = 0
+                    player.onGravitile = True
+                    player.canJump = True
+                    player.lastJumpX = None
+                    break
+                # plafond
+                elif player.direction.y < 0 :
+                    player.onGravitile = True
+                    break
+                else:
+                    player.die()
+                player.direction.y = sprite.direction.y
+
+
+        # si le joueur bouge sur l'axe x , on considère qu'il n'est plus en collision avec le mur
+        if player.rect.centerx < self.currentX or player.rect.centerx > self.currentX:
+            player.collideOnLeft = False
+            player.collideOnRight = False
+        # si le joueur bouge sur l'axe y , on considère qu'il n'est plus en collision avec le sol
         if player.onGround and player.direction.y < 0 or player.direction.y > 1:
             player.onGround = False
+
         for npc in self.npcs.sprites():
             if npc.rect.colliderect(player.rect) and player.direction.y > 0:
                 player.rect.bottom = npc.rect.top
                 player.direction.y = player.jumpSpeed / 2
                 npc.kill()
+
+
 
     def npcHorizontalMovementCollision(self):
         player = self.player.sprite
@@ -227,13 +218,6 @@ class Level:
                     npc.rect.left = tile.rect.right
                     npc.direction.x = 1
                 elif tile.rect.colliderect(npc.rect) and npc.direction.x > 0:
-                    npc.rect.right = tile.rect.left
-                    npc.direction.x = -1
-            for npc2 in self.npcs.sprites():
-                if npc2.rect.colliderect(npc.rect) and npc.direction.x < 0 and npc != npc2:
-                    npc.rect.left = tile.rect.right
-                    npc.direction.x = 1
-                elif npc2.rect.colliderect(npc.rect) and npc.direction.x > 0 and npc != npc2:
                     npc.rect.right = tile.rect.left
                     npc.direction.x = -1
 
