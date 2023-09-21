@@ -9,9 +9,6 @@ timer = Timer()
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, level):
         super().__init__()
-        self.image = pygame.Surface((tileSize,tileSize))
-        self.image.fill("red")
-        self.rect = self.image.get_rect(topleft = pos)
         self.level = level
 
         # déplacements
@@ -38,6 +35,10 @@ class Player(pygame.sprite.Sprite):
         self.animationSpeed = 0.1
         self.status = "idle"
         self.facingRight = False
+
+        # rect
+        self.image = self.animations["idle"][self.frameIndex]
+        self.rect = self.image.get_rect(topleft = pos)
     
     def importCharacterAssets(self):
         characterPath = "./graphics/character/"
@@ -79,7 +80,7 @@ class Player(pygame.sprite.Sprite):
 
         if keys[pygame.K_SPACE] and self.onGround and not self.collideOnLeft and not self.collideOnRight:
             self.jump()
-        elif keys[pygame.K_SPACE]:
+        elif keys[pygame.K_SPACE] and not self.spacePressed:
             self.jump()
             self.spacePressed = True
         elif not keys[pygame.K_SPACE]:

@@ -132,7 +132,7 @@ class Level:
                         player.collideOnRight = True
         # si le joueur bouge sur l'axe x , on considère qu'il n'est plus en collision avec le mur
         # print(f"Left: {player.collideOnLeft} - Right: {player.collideOnRight}")
-        if player.rect.centerx < self.currentX or player.rect.centerx > self.currentX:
+        if player.rect.centerx != self.currentX:
             player.collideOnLeft = False
             player.collideOnRight = False
 
