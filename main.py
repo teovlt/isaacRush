@@ -47,10 +47,11 @@ def run():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 pause()
                 timer.startTime = time.monotonic() - elapsed_time
-            if not level.finish:
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_c:
-                    level.setupLevel()
-                    level.loose = True
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_c:
+                level.setupLevel()
+                level.loose = True
+                level.finish = False
+                # level.player.
 
         current_time = time.monotonic()
         elapsed_time = current_time - timer.startTime
@@ -58,7 +59,6 @@ def run():
         # Verification timer
         if timer.bestTime is None or level.finish:
             timer.update_best_time(elapsed_time)
-            screen.set_alpha()
         elif level.loose:
             timer.start()
             level.loose = False

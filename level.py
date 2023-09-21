@@ -76,20 +76,19 @@ class Level:
                     gravitile = Gravitile((x * tileSize, y * tileSize), tileSize)
                     self.gravitiles.add(gravitile)
         self.collidTiles[0] = self.tiles
-        #self.collidTiles[1] = self.spikes
-
+        # self.collidTiles[1] = self.spikes
 
     def blocCollision(self):
         inLadder = False
         player = self.player.sprite
 
         if self.endsprite.sprite.rect.colliderect(player.rect) and self.endsprite.sprite.end:
+            # son de fin
             end = pygame.mixer.Sound("Audio/end.wav")
             pygame.mixer.Channel(1).play(end)
-            self.endsprite.sprite.direction.y -=0.1
+            # La fusée monte
+            self.endsprite.sprite.direction.y -= 0.1
             self.finish = True
-
-
 
         for sprite in self.powerups.sprites():
             if sprite.rect.colliderect(player.rect) and sprite.powerup:
@@ -118,9 +117,8 @@ class Level:
         if not inLadder:
             player.collideOnLadder = False
 
-
     def movementCollision(self):
-    # gestion des collisions horizontales et verticales
+        # gestion des collisions horizontales et verticales
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
         # collision horizontale
@@ -259,10 +257,10 @@ class Level:
     def run(self):
         if self.finish:
             self.endsprite.sprite.up()
-            if self.endsprite.sprite.rect.y == -81:
+            if self.endsprite.sprite.rect.y <= -80:
                 self.setupLevel()
-                self.finish = False
                 self.loose = True
+                self.finish = False
 
         # updates
         self.tiles.update(self.worldShift)
