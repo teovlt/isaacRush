@@ -159,58 +159,9 @@ class Level:
             if npc.rect.colliderect(player.rect) and player.direction.y > 0:
                 player.rect.bottom = npc.rect.top
                 player.direction.y = player.jumpSpeed / 2
-                npc.kill()
-
-
-    def horizontalMovementCollision(self):
-        # gestion des collisions horizontales
-        player = self.player.sprite
-        player.rect.x += player.direction.x * player.speed
-        for groupTile in self.collidTiles:
-            for sprite in groupTile.sprites():
-                if sprite.rect.colliderect(player.rect) and not (
-                        sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
-                    # collisions gauche
-                    if player.direction.x < 0:
-                        player.rect.left = sprite.rect.right
-                        self.currentX = player.rect.centerx
-                        player.collideOnLeft = True
-                    # collisions droite
-                    elif player.direction.x > 0:
-                        player.rect.right = sprite.rect.left
-                        self.currentX = player.rect.centerx
-                        player.collideOnRight = True
-        # si le joueur bouge sur l'axe x , on considère qu'il n'est plus en collision avec le mur
-        # print(f"Left: {player.collideOnLeft} - Right: {player.collideOnRight}")
-        if player.rect.centerx != self.currentX:
-            player.collideOnLeft = False
-            player.collideOnRight = False
-
-    def verticalMovementCollision(self):
-        # gestion des collisions verticales
-        player = self.player.sprite
-        player.applyGravity()
-        for sprite in self.tiles.sprites():
-            # collisions tiles
-            if sprite.rect.colliderect(player.rect) and not (
-                    sprite.ladder or sprite.checkpoint or sprite.powerup or sprite.end or sprite.deadly):
-                # sol
-                if player.direction.y > 0:
-                    player.rect.bottom = sprite.rect.top
-                    player.direction.y = 0
-                    player.onGround = True
-                    player.canJump = True
-                    player.lastJumpX = None
-                # plafond
-                elif player.direction.y < 0:
-                    player.rect.top = sprite.rect.bottom
-                    player.direction.y = 0
-        if player.onGround and player.direction.y < 0 or player.direction.y > 1:
-            player.onGround = False
-        for npc in self.npcs.sprites():
-            if npc.rect.colliderect(player.rect) and player.direction.y > 0:
-                player.rect.bottom = npc.rect.top
-                player.direction.y = player.jumpSpeed / 2
+                # Son quand un npc est tué
+                killNpc = pygame.mixer.Sound("Audio/killNpc.wav")
+                pygame.mixer.Channel(1).play(killNpc)
                 npc.kill()
 
     def npcHorizontalMovementCollision(self):
@@ -328,8 +279,6 @@ class Level:
         self.gravitileVerticalMovementCollision()
 
         # player
-        # self.horizontalMovementCollision()
-        # self.verticalMovementCollision()
         self.movementCollision()
         self.blocCollision()
 

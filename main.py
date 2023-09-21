@@ -18,6 +18,7 @@ if not "-c" in sys.argv:
 
 level = Level(screen, "./map.csv")
 pygame.display.set_caption("")
+pygame.mixer.music.set_volume(0.5)
 
 bg = pygame.image.load("Graphics/Backgrounds/bg.png")
 bgA = pygame.transform.scale(bg, (screenWidth, screenHeight))
