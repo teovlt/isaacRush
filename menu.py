@@ -21,11 +21,18 @@ class Button:
 
     def displayButton(self, screen):
         pygame.draw.rect(screen, self.colorBackground, self.rect)
-        displayText(screen, self.text, 36, self.rect.centerx, self.rect.centery, self.colorText)
+        displayText(screen, self.text, 45, self.rect.centerx, self.rect.centery, self.colorText)
 
 # Fonction pour afficher du texte sur l'écran
 def displayText(screen, text, size, x, y, color):
     police = pygame.font.Font('Graphics/Fonts/neo-latina-demo-FFP.ttf', size)
+    textSurface = police.render(text, True, color)
+    textRect = textSurface.get_rect()
+    textRect.center = (x, y)
+    screen.blit(textSurface, textRect)
+
+def displayNumber(screen, text, size, x, y, color):
+    police = pygame.font.SysFont('new times roman', size)
     textSurface = police.render(text, True, color)
     textRect = textSurface.get_rect()
     textRect.center = (x, y)
