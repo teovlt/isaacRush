@@ -23,6 +23,6 @@ class Npc(pygame.sprite.Sprite):
         self.direction.y += self.gravity
         self.rect.y += self.direction.y
 
-    def update(self, shift):
-        self.rect.x += shift.x
-        self.rect.y += shift.y
+    def update(self, worldShift):
+        self.rect.x += worldShift.x
+        self.rect.y += worldShift.y

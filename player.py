@@ -126,14 +126,17 @@ class Player(pygame.sprite.Sprite):
             self.direction.y = self.jumpSpeed
 
     def respawnLastCheckpoint(self):
-        self.rect.x = self.lastCheckpoint.rect.x
-        self.rect.y = self.lastCheckpoint.rect.y
+        rect = self.lastCheckpoint.rect
+        pos = pygame.math.Vector2(rect.centerx, rect.centery)
+        self.rect.centerx = pos.x
+        self.rect.centery = pos.y
+        self.level.resetCamera()
 
-    def update(self, shift):
+    def update(self, worldShift):
         self.getInput()
         self.getStatus()
         self.animate()
-        self.rect.y += shift.y
+        self.rect.y += worldShift.y
 
     def die(self):
         #Son de mort du joueur
@@ -145,4 +148,3 @@ class Player(pygame.sprite.Sprite):
             self.level.loose = True
         else:
             self.respawnLastCheckpoint()
-            self.level.resetCamera()

@@ -18,7 +18,3 @@ class Gravitile(tile.Tile):
         if self.agravite:
             self.direction.y += self.gravity
             self.rect.y += self.direction.y
-
-    def update(self, shift):
-        self.rect.x += shift.x
-        self.rect.y += shift.y

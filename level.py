@@ -16,28 +16,48 @@ class Level:
     def __init__(self, surface, csv):
         self.csv = csv
         self.displaySurface = surface
-        self.setupLevel()
         self.worldShift = pygame.math.Vector2(0, 0)
         self.currentX = 0
         self.finish = False
         self.loose = False
+        self.setupLevel()
 
     def setupLevel(self):
+        self.cameraObjects = []
+        # Solid blocs
         self.tiles = pygame.sprite.Group()
+        self.cameraObjects.append(self.tiles)
+        # Anti bravity blocks
         self.gravitiles = pygame.sprite.Group()
+        self.cameraObjects.append(self.gravitiles)
+        # Spikes
         self.spikes = pygame.sprite.Group()
+        self.cameraObjects.append(self.spikes)
+        # Power Ups
         self.powerups = pygame.sprite.Group()
+        self.cameraObjects.append(self.powerups)
+        # Checkpoints
         self.checkpoints = pygame.sprite.Group()
+        self.cameraObjects.append(self.checkpoints)
+        # Ladders
         self.ladders = pygame.sprite.Group()
-        self.player = pygame.sprite.GroupSingle()
-        self.endsprite = pygame.sprite.GroupSingle()
+        self.cameraObjects.append(self.ladders)
+        # Npcs
         self.npcs = pygame.sprite.Group()
+        self.cameraObjects.append(self.npcs)
+        # End
+        self.endsprite = pygame.sprite.GroupSingle()
+        self.cameraObjects.append(self.endsprite)
+        # Player
+        self.player = pygame.sprite.GroupSingle()
+        
         self.collidTiles = [self.tiles]
         self.player.lastCheckpoint = None
 
         file = open(self.csv, "r")
         rows = file.read().split("\n")
-        rows.pop()  # Supprimer la dernière ligne vide
+        if not rows[len(rows)-1]:
+            rows.pop()  # Supprimer la dernière ligne vide
 
         for rowIndex, row in enumerate(rows):
             row = row.split(",")
@@ -46,7 +66,7 @@ class Level:
                 x = colIndex
                 y = rowIndex
                 if cell == 1:  # tile -> bloc de mur/sol
-                    if int(rows[rowIndex - 1].split(",")[colIndex]) == 1:
+                    if rowIndex > 0 and int(rows[rowIndex - 1].split(",")[colIndex]) == 1:
                         tile = Tile((x * tileSize, y * tileSize), tileSize, True)
                     else:
                         tile = Tile((x * tileSize, y * tileSize), tileSize, False)
@@ -75,8 +95,10 @@ class Level:
                 elif cell == 9:  # bloc anti gravité
                     gravitile = Gravitile((x * tileSize, y * tileSize), tileSize)
                     self.gravitiles.add(gravitile)
-        self.collidTiles[0] = self.tiles
-        #self.collidTiles[1] = self.spikes
+        self.collidTiles.clear()
+        self.collidTiles.append(self.tiles)
+        self.collidTiles.append(self.spikes)
+        self.resetCamera()
 
 
     def blocCollision(self):
@@ -127,7 +149,7 @@ class Level:
                     self.currentX = player.rect.centerx
                     player.collideOnLeft = True
                     break
-                elif player.direction.x > 0:
+                if player.direction.x > 0:
                     player.rect.right = sprite.rect.left
                     self.currentX = player.rect.centerx
                     player.collideOnRight = True
@@ -143,7 +165,7 @@ class Level:
                     player.canJump = True
                     player.lastJumpX = None
                     break
-                elif player.direction.y < 0:
+                if player.direction.y < 0:
                     player.rect.top = sprite.rect.bottom
                     player.direction.y = 0
                     break
@@ -181,7 +203,6 @@ class Level:
                         self.currentX = player.rect.centerx
                         player.collideOnRight = True
         # si le joueur bouge sur l'axe x , on considère qu'il n'est plus en collision avec le mur
-        # print(f"Left: {player.collideOnLeft} - Right: {player.collideOnRight}")
         if player.rect.centerx != self.currentX:
             player.collideOnLeft = False
             player.collideOnRight = False
@@ -224,13 +245,6 @@ class Level:
                 elif tile.rect.colliderect(npc.rect) and npc.direction.x > 0:
                     npc.rect.right = tile.rect.left
                     npc.direction.x = -1
-            for npc2 in self.npcs.sprites():
-                if npc2.rect.colliderect(npc.rect) and npc.direction.x < 0 and npc != npc2:
-                    npc.rect.left = tile.rect.right
-                    npc.direction.x = 1
-                elif npc2.rect.colliderect(npc.rect) and npc.direction.x > 0 and npc != npc2:
-                    npc.rect.right = tile.rect.left
-                    npc.direction.x = -1
 
             if npc.rect.colliderect(player.rect):
                 self.player.sprite.die()
@@ -264,45 +278,54 @@ class Level:
                 check = pygame.mixer.Sound("Audio/capacity.wav")
                 pygame.mixer.Channel(1).play(check)
 
-    def scrollX(self):
+    def cameraBehavior(self):
         player = self.player.sprite
-        playerX = player.rect.centerx
-        directionX = player.direction.x
+        pos = pygame.math.Vector2(player.rect.centerx, player.rect.centery)
+        direction = player.direction
+        maxDY = screenHeight / 4
+        dy = screenHeight / 2 - pos.y
 
-        if playerX < screenWidth / 4 and directionX < 0:
+        # x axis behavior
+        if pos.x < screenWidth / 4 and direction.x < 0:
             self.worldShift.x = playerSpeed
             player.speed = 0
-        elif playerX > screenWidth - (screenWidth / 4) and directionX > 0:
+        elif pos.x > 3 * screenWidth / 4 and direction.x > 0:
             self.worldShift.x = -playerSpeed
             player.speed = 0
         else:
             self.worldShift.x = 0
             player.speed = playerSpeed
 
-    def cameraFollowPlayer(self):
-        player = self.player.sprite
-        playerY = player.rect.centery
-        screenCenter = screenHeight / 2
-        playerDelta = screenCenter - playerY
-
-        if abs(playerDelta) - 100 > 0:
-            if playerDelta > 0:
-                self.worldShift.y = playerDelta - 100
-            if playerDelta < 0:
-                self.worldShift.y = playerDelta + 100
+        # y axis behavior
+        if abs(dy) > maxDY:
+            self.worldShift.y = dy - maxDY if dy > 0 else dy + maxDY
         else:
             self.worldShift.y = 0
 
     def resetCamera(self):
         player = self.player.sprite
-        playerPos = pygame.math.Vector2(player.rect.centerx, player.rect.centery)
-        screen = pygame.math.Vector2(screenWidth / 2, screenHeight / 2)
-        delta = pygame.math.Vector2(screen.x - playerPos.x, screen.y - playerPos.y)
+        player_center = pygame.math.Vector2(player.rect.centerx, player.rect.centery)
 
-        self.worldShift = delta
+        # Calculate the delta between the player's position and the center of the screen
+        delta = pygame.math.Vector2(screenWidth / 2 - player_center.x, screenHeight / 2 - player_center.y)
+
+        # Update the player's x position based on delta
+        player.rect.centerx += delta.x
+
+        # Update the positions of other cameraObjects
+        for group in self.cameraObjects:
+            for sprite in group.sprites():
+                sprite.rect.centerx += delta.x  # Update x position
+                # sprite.rect.top += delta.y  # Update y position
+
+        # Print debug information (optional)
+        print(f"Player x: {player_center.x}, y: {player_center.y}")
+        print(f"Delta x: {delta.x}, y: {delta.y}")
+
 
     def run(self):
         # updates
+        self.player.update(self.worldShift)
         self.tiles.update(self.worldShift)
         self.gravitiles.update(self.worldShift)
         self.spikes.update(self.worldShift)
@@ -311,7 +334,6 @@ class Level:
         self.ladders.update(self.worldShift)
         self.endsprite.update(self.worldShift)
         self.npcs.update(self.worldShift)
-        self.player.update(self.worldShift)
 
         # draw
         self.tiles.draw(self.displaySurface)
@@ -328,8 +350,6 @@ class Level:
         self.gravitileVerticalMovementCollision()
 
         # player
-        # self.horizontalMovementCollision()
-        # self.verticalMovementCollision()
         self.movementCollision()
         self.blocCollision()
 
@@ -338,5 +358,4 @@ class Level:
         self.npcVerticalMovementCollision()
 
         # camera
-        self.scrollX()
-        self.cameraFollowPlayer()
+        self.cameraBehavior()

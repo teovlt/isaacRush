@@ -17,7 +17,6 @@ class Tile(pygame.sprite.Sprite):
         self.ladder = False
         self.antiGravity = False
 
-    def update(self, shift):
-        self.rect.x += shift.x
-        self.rect.y += shift.y
-
+    def update(self, worldShift):
+        self.rect.y += worldShift.y
+        self.rect.x += worldShift.x
