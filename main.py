@@ -20,7 +20,7 @@ level = Level(screen, "./map.csv")
 pygame.display.set_caption("")
 
 bg = pygame.image.load("Graphics/Backgrounds/bg.png")
-bgA = pygame.transform.scale(bg, (1280, 720))
+bgA = pygame.transform.scale(bg, (screenWidth, screenHeight))
 
 
 # Music
