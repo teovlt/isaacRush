@@ -145,7 +145,6 @@ class Level:
                 player.rect.bottom = npc.rect.top
                 player.direction.y = player.jumpSpeed / 2
                 npc.kill()
-                self.loose = True
 
     def gravitileVerticalMovementCollision(self):
         for gravitile in self.gravitiles.sprites():

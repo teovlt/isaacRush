@@ -32,13 +32,14 @@ pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
 # Fonction pour démarrer le jeu
 def startGame():
     level.setupLevel("./map.csv")
+    timer.start()
     run()
 
 
 # cycle du jeu
 def run():
     running = True
-    timer.start()
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -47,7 +48,6 @@ def run():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 pause()
                 timer.startTime = time.monotonic() - elapsed_time
-
 
         current_time = time.monotonic()
         elapsed_time = current_time - timer.startTime
@@ -68,7 +68,7 @@ def run():
         # screen.blit(bgC,(0, 0))
         # screen.blit(bgD,(0, 0))
         level.run()
-        #Affichage du temps
+        # Affichage du temps
         current = timer.drawCurrent(elapsed_time)
         best = timer.drawBest()
         screen.blit(current, (10, 10))
@@ -111,15 +111,7 @@ def pause():
 def unpause():
     # Efface le menu pause
     screen.fill('black')
-    isTiming = True
-
     # Reprend le jeu
-    run()
-
-
-def resume():
-    unpause()
-
 
 def quitGame():
     mainMenu()
