@@ -117,16 +117,12 @@ class Level:
 
     def movementCollision(self):
     # gestion des collisions horizontales et verticales
-
         player = self.player.sprite
-
-        print(player.onGravitile)
         player.rect.x += player.direction.x * player.speed
         listeSprites = []
         for groupe in self.collidTiles:
             for sprite in groupe.sprites():
                 listeSprites.append(sprite)
-
     # collision horizontale
         for sprite in listeSprites:
             if sprite.rect.colliderect(player.rect):
