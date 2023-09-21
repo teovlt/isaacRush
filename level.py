@@ -149,6 +149,7 @@ class Level:
                     player.direction.y = 0
                     player.onGround = True
                     player.canJump = True
+                    player.lastJumpX = None
                 # plafond
                 elif player.direction.y < 0:
                     player.rect.top = sprite.rect.bottom
