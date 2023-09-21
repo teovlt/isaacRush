@@ -123,6 +123,7 @@ def mainMenu():
     running = True
     pygame.mixer.music.load("Audio/menu.mp3")
     pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
+    pygame.mixer.music.set_volume(0.5)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

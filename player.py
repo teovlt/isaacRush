@@ -136,6 +136,10 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += shift.y
 
     def die(self):
+        #Son de mort du joueur
+        check = pygame.mixer.Sound("Audio/death.wav")
+        pygame.mixer.Channel(1).play(check)
+
         if self.lastCheckpoint is None:
             self.level.setupLevel()
             self.level.loose = True

@@ -101,6 +101,7 @@ class Level:
             if sprite.rect.colliderect(player.rect):
                 if self.player.sprite.lastCheckpoint != sprite:
                     self.player.sprite.lastCheckpoint = sprite
+                    #Changement du look du checkPoint une fois traversé et ajout d'un effet sonore
                     image = pygame.image.load("Graphics/CheckPoints/flagPassed.png")
                     imageF = pygame.transform.scale(image, (80, 120))
                     sprite.image = imageF
@@ -222,6 +223,9 @@ class Level:
             if gravitile.onGround:
                 gravitile.direction.y = gravitile.jumpSpeed
                 gravitile.onGround = False
+                check = pygame.mixer.Sound("Audio/capacity.wav")
+                pygame.mixer.Channel(1).play(check)
+
 
 
     def scrollX(self):
