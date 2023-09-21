@@ -44,7 +44,9 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.x = 0
 
-        if keys[pygame.K_SPACE] and not self.spacePressed:
+        if keys[pygame.K_SPACE] and self.onGround and not self.collideOnLeft and not self.collideOnRight:
+            self.jump()
+        elif keys[pygame.K_SPACE]:
             self.jump()
             self.spacePressed = True
         elif not keys[pygame.K_SPACE]:
