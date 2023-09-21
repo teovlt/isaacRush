@@ -349,6 +349,7 @@ class Level:
 
         # player
         self.movementCollision()
+        self.blocCollision()
 
         # npcs
         self.npcHorizontalMovementCollision()
