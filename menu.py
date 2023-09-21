@@ -30,3 +30,10 @@ def displayText(screen, text, size, x, y, color):
     textRect = textSurface.get_rect()
     textRect.center = (x, y)
     screen.blit(textSurface, textRect)
+
+def displayNumber(screen, text, size, x, y, color):
+    police = pygame.font.SysFont('new times roman', size)
+    textSurface = police.render(text, True, color)
+    textRect = textSurface.get_rect()
+    textRect.center = (x, y)
+    screen.blit(textSurface, textRect)
