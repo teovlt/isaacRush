@@ -84,8 +84,12 @@ class Level:
         player = self.player.sprite
 
         if self.endsprite.sprite.rect.colliderect(player.rect) and self.endsprite.sprite.end:
-            self.setupLevel()
+            end = pygame.mixer.Sound("Audio/end.wav")
+            pygame.mixer.Channel(1).play(end)
+            self.endsprite.sprite.direction.y -=0.1
             self.finish = True
+
+
 
         for sprite in self.powerups.sprites():
             if sprite.rect.colliderect(player.rect) and sprite.powerup:
@@ -253,6 +257,13 @@ class Level:
         self.worldShift = delta
 
     def run(self):
+        if self.finish:
+            self.endsprite.sprite.up()
+            if self.endsprite.sprite.rect.y == -81:
+                self.setupLevel()
+                self.finish = False
+                self.loose = True
+
         # updates
         self.tiles.update(self.worldShift)
         self.gravitiles.update(self.worldShift)
@@ -272,7 +283,8 @@ class Level:
         self.powerups.draw(self.displaySurface)
         self.ladders.draw(self.displaySurface)
         self.endsprite.draw(self.displaySurface)
-        self.player.draw(self.displaySurface)
+        if not self.finish:
+            self.player.draw(self.displaySurface)
         self.npcs.draw(self.displaySurface)
 
         # gravitiles

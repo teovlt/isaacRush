@@ -130,7 +130,10 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = self.lastCheckpoint.rect.y
 
     def update(self, shift):
-        self.getInput()
+        if not self.level.finish:
+            self.getInput()
+        else:
+            self.direction.x = 0
         self.getStatus()
         self.animate()
         self.rect.y += shift.y
