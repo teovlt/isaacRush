@@ -29,11 +29,14 @@ bg = pygame.transform.scale(bg, (screenWidth, screenHeight))
 
 keys = pygame.image.load("Graphics/Keys/keys.svg")
 
+
 # Fonction pour démarrer le jeu
 def startGame():
     level.setupLevel()
     timer.start()
     run()
+
+
 def loadBestScore():
     if os.path.exists('bestTime.txt'):
         with open('bestTime.txt', 'r') as file:
@@ -151,7 +154,6 @@ def mainMenu():
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -165,7 +167,7 @@ def mainMenu():
         # Afficher le titre du jeu dans le menu
         displayText(screen, "Isaac Rush", 150, screenWidth // 2, 150, 'white')
         displayText(screen, "Meilleur temps : ", 25, 120, screenHeight - 25, 'white')
-        displayNumber(screen, str(round(bestScore, 3)),30,250, screenHeight - 22, 'white')
+        displayNumber(screen, str(round(bestScore, 3)), 30, 250, screenHeight - 22, 'white')
 
         # Afficher le menu
         menu.displayButtons(screen)
@@ -174,15 +176,50 @@ def mainMenu():
         pygame.display.flip()
 
 
+def credits():
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                for button in credit.buttons:
+                    if button.rect.collidepoint(event.pos) and button.action:
+                        button.action()
+
+        # Effacer l'écran
+        screen.fill('black')
+
+        # Afficher le titre du jeu dans le menu
+        displayText(screen, "Crédits", 150, screenWidth // 2, 150, 'white')
+        displayText(screen, "Textures, characteres, jacket et assets : https://itch.io/", 30,  screenWidth // 2, screenHeight - 475, 'white')
+        displayText(screen, "Sons utilisés : https://mixkit.co/free-sound-effects & https://pixabay.com/fr/music/",30,  screenWidth // 2, screenHeight - 400, 'white')
+        displayText(screen, "Robot design et animation : https://www.artstation.com/artwork/Jv9G8R", 30,  screenWidth // 2, screenHeight - 325, 'white')
+        displayText(screen, "Teo: graphismes, musiques, bruitages, Timer, monstres ", 30,  screenWidth // 2, screenHeight - 250, 'white')
+        displayText(screen, "Felix: Blocks et physique, Editeur de map et level design", 30,  screenWidth // 2, screenHeight - 225, 'white')
+        displayText(screen, "Gabriel: Physique, Caméra, Animations", 30,  screenWidth // 2, screenHeight - 200, 'white')
+        displayText(screen, "Doriane: Menu, Sauvegarde du timer, Conception", 30,  screenWidth // 2, screenHeight - 175, 'white')
+
+
+        # Afficher le menu
+        credit.displayButtons(screen)
+        # Mettre à jour l'affichage
+        pygame.display.flip()
+
+
+credit = Menu()
+buttonBack = Button(screenWidth // 2 - 100, screenHeight - 150, 200, 75, "Retour", 'black', 'white', mainMenu)
+credit.addButton(buttonBack)  #  Ajoute le bouton au menu
+
 # Créer le menu principal et ses boutons
 menu = Menu()
 buttonPlay = Button(screenWidth // 2 - 150, screenHeight // 2 - 115, 300, 75, "Jouer", 'black', 'white', startGame)
 menu.addButton(buttonPlay)  #  Ajoute le bouton au menu
-buttonCredits = Button(screenWidth // 2 - 150, screenHeight // 2, 300, 75, "Crédits", 'black', 'white', startGame)
-menu.addButton(buttonCredits)   #  Ajoute le bouton au menu
+buttonCredits = Button(screenWidth // 2 - 150, screenHeight // 2, 300, 75, "Crédits", 'black', 'white', credits)
+menu.addButton(buttonCredits)  #  Ajoute le bouton au menu
 buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 115, 300, 75, "Quitter", 'black', 'white', quit)
 menu.addButton(buttonQuit)  #  Ajoute le bouton au menu
-
 
 bestScore = loadBestScore()  # Charge le meilleur score au démarrage
 

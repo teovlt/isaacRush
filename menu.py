@@ -25,7 +25,7 @@ class Button:
 
 # Fonction pour afficher du texte sur l'écran
 def displayText(screen, text, size, x, y, color):
-    police = pygame.font.Font('Graphics/Fonts/neo-latina-demo-FFP.ttf', size)
+    police = pygame.font.SysFont('Graphics/Fonts/neo-latina-demo-FFP.ttf', size)
     textSurface = police.render(text, True, color)
     textRect = textSurface.get_rect()
     textRect.center = (x, y)
