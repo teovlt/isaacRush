@@ -95,8 +95,9 @@ def run():
         screen.blit(best, (10, 50))
         screen.blit(keys, (10, screenHeight - keys.get_rect().height - 10))
 
-        pygame.display.update()
         clock.tick(60)  # limiter à 60fps
+        pygame.display.update()
+        # pygame.display.set_caption("fps: " + str(clock.get_fps()))
 
     pygame.quit()
 
