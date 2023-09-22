@@ -18,7 +18,7 @@ if not "-c" in sys.argv:
     df.to_csv('map.csv', header=False, index=False)
 
 level = Level(screen, "./map.csv")
-pygame.display.set_caption("")
+pygame.display.set_caption("Isaac Rush")
 
 # Volume de la musique
 pygame.mixer.music.set_volume(0.4)
@@ -98,8 +98,8 @@ def run():
         screen.blit(best, (10, 50))
         screen.blit(keys, (10, screenHeight - keys.get_rect().height - 10))
 
-        pygame.display.update()
         clock.tick(60)  # limiter à 60fps
+        pygame.display.update()
 
     pygame.quit()
 
