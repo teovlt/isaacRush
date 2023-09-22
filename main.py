@@ -63,9 +63,6 @@ def run():
     pygame.mixer.music.load("Audio/game.mp3")
     pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
     while running:
-        current_time = time.monotonic()
-        elapsed_time = current_time - timer.startTime
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -75,16 +72,19 @@ def run():
                 timer.startTime = time.monotonic() - elapsed_time
             if event.type == pygame.KEYDOWN and event.key == pygame.K_c:
                 level.setupLevel()
-                level.loose = True
+                timer.start()
                 level.finish = False
+
+        current_time = time.monotonic()
+        elapsed_time = current_time - timer.startTime
 
         # Verification timer
         if level.finish:
             timer.update_best_time(elapsed_time)
             bestScore = loadBestScore()
-        elif timer.bestTime == 0:
+        if timer.bestTime == 0:
             timer.bestTime = loadBestScore()
-        elif level.loose:
+        if level.loose:
             timer.start()
             level.loose = False
 
