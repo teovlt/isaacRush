@@ -12,6 +12,8 @@ class Timer:
     def update_best_time(self, elapsed_time):
         if elapsed_time < self.bestTime or self.bestTime == 0:
             self.bestTime = elapsed_time
+            with open('bestTime.txt', 'w') as file:
+                file.write(str(elapsed_time))
 
     def drawCurrent(self, elapsed_time):
         font = pygame.font.Font(None, 36)

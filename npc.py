@@ -7,8 +7,8 @@ class Npc(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
 
-        self.image = pygame.image.load("Graphics/Blocks/block.png")
-        self.image = pygame.transform.scale(self.image, (tileSize/2, tileSize/2))  # Redimensionner si nécessaire
+        self.image = pygame.image.load("Graphics/Npcs/leftNpc.png")
+        self.image = pygame.transform.scale(self.image, (tileSize, tileSize))  # Redimensionner si nécessaire
         self.rect = self.image.get_rect(topleft=pos)
 
         # déplacements
