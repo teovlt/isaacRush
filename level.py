@@ -10,8 +10,9 @@ from spike import Spike
 from end import End
 from ladder import Ladder
 from gravitile import Gravitile
+from timer import Timer
 
-
+timer = Timer()
 class Level:
     def __init__(self, surface, csv):
         self.csv = csv
@@ -324,8 +325,9 @@ class Level:
             self.endsprite.sprite.up()
             if self.endsprite.sprite.rect.y <= -80:
                 self.setupLevel()
-                self.loose = True
                 self.finish = False
+                self.loose = True
+                timer.start()
 
         # updates
         self.player.update(self.worldShift)

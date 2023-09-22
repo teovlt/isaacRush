@@ -71,13 +71,12 @@ def run():
                 pause()
                 timer.startTime = time.monotonic() - elapsed_time
             if event.type == pygame.KEYDOWN and event.key == pygame.K_c:
-                level.setupLevel()
                 timer.start()
                 level.finish = False
+                level.setupLevel()
 
         current_time = time.monotonic()
         elapsed_time = current_time - timer.startTime
-
         # Verification timer
         if level.finish:
             timer.update_best_time(elapsed_time)
@@ -122,6 +121,10 @@ def pause():
                             if button.action:
                                 button.action()
                                 paused = False
+        if level.finish:
+            timer.start()
+            level.finish = False
+            level.setupLevel()
         screen.fill('black')
         displayText(screen, "Pause", 150, screenWidth // 2, 200, 'white')
         displayText(screen, "Meilleur temps : ", 25, 120, screenHeight - 25, 'white')
