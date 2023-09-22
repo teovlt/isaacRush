@@ -14,11 +14,11 @@ clock = pygame.time.Clock()
 timer = Timer()
 
 if not "-c" in sys.argv:
-    df = pandas.read_excel('./map.ods')
+    df = pandas.read_excel('./'
+                           'map.ods')
     df.to_csv('map.csv', header=False, index=False)
 
 level = Level(screen, "./map.csv")
-pygame.display.set_caption("Isaac Rush")
 
 # Volume de la musique
 pygame.mixer.music.set_volume(0.4)
@@ -99,11 +99,13 @@ def run():
 
         clock.tick(60)  # limiter à 60fps
         pygame.display.update()
+        pygame.display.set_caption(str(round(clock.get_fps(),1)))
 
     pygame.quit()
 
 
 def pause():
+    pygame.display.set_caption("Isaac Rush")
     paused = True
     while paused:
         for event in pygame.event.get():
@@ -151,6 +153,7 @@ def quit():
 
 
 def mainMenu():
+    pygame.display.set_caption("Isaac Rush")
     running = True
     pygame.mixer.music.load("Audio/menu.mp3")
     pygame.mixer.music.play(-1)  # Le paramètre -1 indique de jouer en boucle
