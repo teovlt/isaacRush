@@ -207,6 +207,38 @@ def credits():
         # Mettre à jour l'affichage
         pygame.display.flip()
 
+def story():
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                for button in histoire.buttons:
+                    if button.rect.collidepoint(event.pos) and button.action:
+                        button.action()
+
+        # Effacer l'écran
+        screen.fill('black')
+
+        # Afficher le titre du jeu dans le menu
+        displayText(screen, "Histoire", 150, screenWidth // 2, 150, 'white')
+        displayText(screen, "Isaac le robot, créé par un scientifique fou, s'est écrasé sur une planète inconnue. Il échappa aux monstres qui rôdaient,", 32,  screenWidth // 2, screenHeight - 475, 'white')
+        displayText(screen, "Puis il décida de partir à la recherche de sa fusée son seul moyen de s'échapper de cette planète étrange.", 32,  screenWidth // 2, screenHeight - 400, 'white')
+        displayText(screen, "Il a rapidement réalisé qu'il devrait utiliser ses compétences spéciales pour survivre notamment avec la touche E.", 32,  screenWidth // 2, screenHeight - 325, 'white')
+        displayText(screen, "N'hésitez pas à utiliser vos compétences avec la touche E pour soulever les rochers gravitationnels", 32,  screenWidth // 2, screenHeight - 250, 'white')
+
+
+        # Afficher le menu
+        credit.displayButtons(screen)
+        # Mettre à jour l'affichage
+        pygame.display.flip()
+
+
+histoire = Menu()
+buttonBack = Button(screenWidth // 2 - 100, screenHeight - 150, 200, 75, "Retour", 'black', 'white', mainMenu)
+histoire.addButton(buttonBack)  #  Ajoute le bouton au menu
 
 credit = Menu()
 buttonBack = Button(screenWidth // 2 - 100, screenHeight - 150, 200, 75, "Retour", 'black', 'white', mainMenu)
@@ -218,8 +250,11 @@ buttonPlay = Button(screenWidth // 2 - 150, screenHeight // 2 - 115, 300, 75, "J
 menu.addButton(buttonPlay)  #  Ajoute le bouton au menu
 buttonCredits = Button(screenWidth // 2 - 150, screenHeight // 2, 300, 75, "Crédits", 'black', 'white', credits)
 menu.addButton(buttonCredits)  #  Ajoute le bouton au menu
-buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 115, 300, 75, "Quitter", 'black', 'white', quit)
+buttonHistoire = Button(screenWidth // 2 - 150, screenHeight // 2 + 115, 300, 75, "Histoire", 'black', 'white', story)
+menu.addButton(buttonHistoire)  #  Ajoute le bouton au menu
+buttonQuit = Button(screenWidth // 2 - 150, screenHeight // 2 + 225, 300, 75, "Quitter", 'black', 'white', quit)
 menu.addButton(buttonQuit)  #  Ajoute le bouton au menu
+
 
 bestScore = loadBestScore()  # Charge le meilleur score au démarrage
 
